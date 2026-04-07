@@ -26,16 +26,16 @@ function renderDescription(text: string) {
 
 export default function LessonContent({ section, lesson, prev, next }: Props) {
   return (
-    <div className="max-w-2xl mx-auto py-10 px-6">
+    <div className="max-w-4xl mx-auto py-12 px-10">
       {/* Section label */}
-      <p className="font-mono text-xs uppercase tracking-widest text-[#4ec9b0] mb-2">
+      <p className="font-mono text-sm uppercase tracking-widest text-[#4ec9b0] mb-3">
         {section.title}
       </p>
 
       {/* Title + keys */}
-      <div className="flex items-start justify-between gap-4 mb-6">
-        <h1 className="font-mono text-2xl font-bold text-white">{lesson.title}</h1>
-        <div className="flex gap-1.5 shrink-0 pt-1">
+      <div className="flex items-start justify-between gap-4 mb-8">
+        <h1 className="font-mono text-3xl font-bold text-white">{lesson.title}</h1>
+        <div className="flex gap-2 shrink-0 pt-1">
           {lesson.keys.map((k, i) => (
             <KeyBadge key={i} keyName={k} large />
           ))}
@@ -43,13 +43,13 @@ export default function LessonContent({ section, lesson, prev, next }: Props) {
       </div>
 
       {/* Description */}
-      <div className="font-mono text-sm text-[#9aa0c0] leading-relaxed mb-8 p-4 bg-[#1e2436] rounded-lg border border-[#2e3450]">
+      <div className="font-mono text-base text-[#9aa0c0] leading-loose mb-10 p-6 bg-[#1e2436] rounded-lg border border-[#2e3450]">
         {renderDescription(lesson.description)}
       </div>
 
       {/* Interactive editor */}
-      <div className="mb-10">
-        <h2 className="font-mono text-sm font-semibold text-[#4ec9b0] uppercase tracking-widest mb-3">
+      <div className="mb-12">
+        <h2 className="font-mono text-sm font-semibold text-[#4ec9b0] uppercase tracking-widest mb-4">
           Practice
         </h2>
         <VimEditor

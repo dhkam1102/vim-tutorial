@@ -41,12 +41,12 @@ export default function VimEditor({ initialText, instructions, hint }: VimEditor
         keymap.of([...defaultKeymap, ...historyKeymap]),
         EditorView.theme({
           '&': {
-            fontSize: '14px',
+            fontSize: '16px',
             fontFamily: 'var(--font-mono), "JetBrains Mono", monospace',
             backgroundColor: '#1a1e2e',
           },
-          '.cm-content': { padding: '12px 0' },
-          '.cm-line': { padding: '0 12px' },
+          '.cm-content': { padding: '16px 0' },
+          '.cm-line': { padding: '0 16px', lineHeight: '1.7' },
           '.cm-gutters': { backgroundColor: '#161a28', borderRight: '1px solid #2e3450' },
           '.cm-activeLineGutter': { backgroundColor: '#1e2436' },
           '.cm-activeLine': { backgroundColor: '#1e2436' },
@@ -87,7 +87,7 @@ export default function VimEditor({ initialText, instructions, hint }: VimEditor
     <div className="rounded-lg overflow-hidden border border-[#2e3450]">
       {/* Instructions bar */}
       <div className="bg-[#1e2436] px-4 py-3 border-b border-[#2e3450]">
-        <p className="font-mono text-sm text-[#9aa0c0]">
+        <p className="font-mono text-base text-[#9aa0c0]">
           <span className="text-[#4ec9b0] font-semibold">Exercise: </span>
           {instructions}
         </p>
