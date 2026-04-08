@@ -1,0 +1,33 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../lib/generated/prisma"
+}
+
+datasource db {
+  provider = "mysql"
+}
+
+model User {
+  id           String         @id @default(cuid())
+  email        String         @unique
+  passwordHash String
+  role         String         @default("user")
+  createdAt    DateTime       @default(now())
+  progress     UserProgress[]
+}
+
+model UserProgress {
+  id          String   @id @default(cuid())
+  userId      String
+  sectionId   String
+  lessonId    String
+  stars       Int
+  hintsUsed   Boolean  @default(false)
+  resetsUsed  Boolean  @default(false)
+  completedAt DateTime @default(now())
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, sectionId, lessonId])
+  @@index([userId])
+  @@index([userId, completedAt])
+}

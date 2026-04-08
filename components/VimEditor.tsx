@@ -14,13 +14,28 @@ type VimEditorProps = {
   initialText: string
   instructions: string
   hint?: string
+  solution?: string
+  onComplete?: () => void
+  onHintUsed?: () => void
+  onReset?: () => void
 }
 
-export default function VimEditor({ initialText, instructions, hint }: VimEditorProps) {
+export default function VimEditor({
+  initialText,
+  instructions,
+  hint,
+  solution,
+  onComplete,
+  onHintUsed,
+  onReset,
+}: VimEditorProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const viewRef = useRef<EditorView | null>(null)
+  const completedRef = useRef(false)
+  const hintUsedRef = useRef(false)
   const [showHint, setShowHint] = useState(false)
   const [mode, setMode] = useState('NAV')
+  const [completed, setCompleted] = useState(false)
   const { theme } = useTheme()
   const { editorHeight, fontSize, lineNumbers: showLineNumbers } = usePreferences()
 
@@ -64,6 +79,8 @@ export default function VimEditor({ initialText, instructions, hint }: VimEditor
   useEffect(() => {
     if (!containerRef.current) return
 
+    completedRef.current = false
+
     const modeDisplay = EditorView.updateListener.of((update) => {
       const cm = getCM(update.view)
       if (cm) {
@@ -71,6 +88,15 @@ export default function VimEditor({ initialText, instructions, hint }: VimEditor
         if (vimState) {
           const m = vimState.insertMode ? 'EDIT' : vimState.visualMode ? 'SELECT' : 'NAV'
           setMode(m)
+        }
+      }
+
+      if (solution && !completedRef.current) {
+        const doc = update.view.state.doc.toString().trimEnd()
+        if (doc === solution.trimEnd()) {
+          completedRef.current = true
+          setCompleted(true)
+          onComplete?.()
         }
       }
     })
@@ -108,6 +134,11 @@ export default function VimEditor({ initialText, instructions, hint }: VimEditor
       '.cm-focused': { outline: 'none' },
     })
 
+    const blockMouse = EditorView.domEventHandlers({
+      mousedown: (e) => { e.preventDefault(); return true },
+      contextmenu: (e) => { e.preventDefault(); return true },
+    })
+
     const state = EditorState.create({
       doc: initialText,
       extensions: [
@@ -119,6 +150,7 @@ export default function VimEditor({ initialText, instructions, hint }: VimEditor
         ...(isDark ? [oneDark, darkTheme] : [lightTheme]),
         keymap.of([...defaultKeymap, ...historyKeymap]),
         modeDisplay,
+        blockMouse,
       ],
     })
 
@@ -134,7 +166,7 @@ export default function VimEditor({ initialText, instructions, hint }: VimEditor
       view.destroy()
       viewRef.current = null
     }
-  }, [initialText, theme, fontSize, showLineNumbers])
+  }, [initialText, theme, fontSize, showLineNumbers, solution, onComplete])
 
   function handleReset() {
     if (!viewRef.current) return
@@ -146,6 +178,23 @@ export default function VimEditor({ initialText, instructions, hint }: VimEditor
       },
     })
     viewRef.current.focus()
+    onReset?.()
+  }
+
+  function handleShowHint() {
+    setShowHint((v) => !v)
+    if (!hintUsedRef.current) {
+      hintUsedRef.current = true
+      onHintUsed?.()
+    }
+  }
+
+  function handleMarkComplete() {
+    if (!completedRef.current) {
+      completedRef.current = true
+      setCompleted(true)
+      onComplete?.()
+    }
   }
 
   return (
@@ -171,24 +220,37 @@ export default function VimEditor({ initialText, instructions, hint }: VimEditor
 
       {/* Status bar */}
       <div className="bg-[var(--bg-base)] px-4 py-2 border-t border-[var(--border)] flex items-center justify-between">
-        <span
-          className={`font-mono text-xs px-2 py-0.5 rounded font-bold ${
-            mode === 'EDIT'
-              ? 'bg-[var(--accent)] text-[var(--accent-text)]'
-              : mode === 'SELECT'
-              ? 'bg-purple-500 text-white'
-              : 'bg-[var(--bg-active)] text-[var(--text-secondary)]'
-          }`}
-        >
-          {mode}
-        </span>
+        <div className="flex items-center gap-2">
+          <span
+            className={`font-mono text-xs px-2 py-0.5 rounded font-bold ${
+              mode === 'EDIT'
+                ? 'bg-[var(--accent)] text-[var(--accent-text)]'
+                : mode === 'SELECT'
+                ? 'bg-purple-500 text-white'
+                : 'bg-[var(--bg-active)] text-[var(--text-secondary)]'
+            }`}
+          >
+            {mode}
+          </span>
+          {completed && (
+            <span className="font-mono text-xs text-yellow-400 font-semibold">✓ complete</span>
+          )}
+        </div>
         <div className="flex gap-3">
           {hint && (
             <button
-              onClick={() => setShowHint((v) => !v)}
+              onClick={handleShowHint}
               className="font-mono text-xs text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors"
             >
               {showHint ? 'hide hint' : 'show hint'}
+            </button>
+          )}
+          {!solution && !completed && (
+            <button
+              onClick={handleMarkComplete}
+              className="font-mono text-xs text-[var(--text-secondary)] hover:text-[var(--accent)] transition-colors"
+            >
+              mark done
             </button>
           )}
           <button

@@ -4,6 +4,8 @@ import './globals.css'
 import SidebarLayout from '@/components/SidebarLayout'
 import { ThemeProvider } from '@/context/ThemeContext'
 import { PreferencesProvider } from '@/context/PreferencesContext'
+import AuthSessionProvider from '@/components/AuthSessionProvider'
+import { ProgressProvider } from '@/context/ProgressContext'
 
 const geistMono = Geist_Mono({
   variable: '--font-mono',
@@ -21,7 +23,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className="h-full flex bg-[var(--bg-base)] antialiased">
         <ThemeProvider>
           <PreferencesProvider>
-            <SidebarLayout>{children}</SidebarLayout>
+            <AuthSessionProvider>
+              <ProgressProvider>
+                <SidebarLayout>{children}</SidebarLayout>
+              </ProgressProvider>
+            </AuthSessionProvider>
           </PreferencesProvider>
         </ThemeProvider>
       </body>

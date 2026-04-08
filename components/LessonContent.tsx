@@ -1,8 +1,12 @@
+'use client'
+
+import { useState } from 'react'
 import Link from 'next/link'
 import { Lesson, Section } from '@/data/curriculum'
 import KeyBadge from './KeyBadge'
 import VimEditor from './VimEditor'
 import DemoPlayer from './DemoPlayer'
+import { useProgress } from '@/context/ProgressContext'
 
 type Props = {
   section: Section
@@ -38,6 +42,16 @@ function renderDescription(text: string) {
 }
 
 export default function LessonContent({ section, lesson, prev, next }: Props) {
+  const [hintsUsed, setHintsUsed] = useState(false)
+  const [resetsUsed, setResetsUsed] = useState(false)
+  const { recordCompletion, getStars } = useProgress()
+
+  const stars = getStars(section.id, lesson.id)
+
+  function handleComplete() {
+    recordCompletion(section.id, lesson.id, hintsUsed, resetsUsed)
+  }
+
   return (
     <div className="max-w-4xl mx-auto py-12 px-10">
       {/* Section label */}
@@ -48,10 +62,17 @@ export default function LessonContent({ section, lesson, prev, next }: Props) {
       {/* Title + keys */}
       <div className="flex items-start justify-between gap-4 mb-8">
         <h1 className="font-mono text-3xl font-bold text-[var(--text-primary)]">{lesson.title}</h1>
-        <div className="flex gap-2 shrink-0 pt-1">
-          {lesson.keys.map((k, i) => (
-            <KeyBadge key={i} keyName={k} large />
-          ))}
+        <div className="flex items-center gap-3 shrink-0 pt-1">
+          {stars !== null && (
+            <span className="font-mono text-lg text-yellow-400">
+              {'★'.repeat(stars)}{'☆'.repeat(3 - stars)}
+            </span>
+          )}
+          <div className="flex gap-2">
+            {lesson.keys.map((k, i) => (
+              <KeyBadge key={i} keyName={k} large />
+            ))}
+          </div>
         </div>
       </div>
 
@@ -69,9 +90,14 @@ export default function LessonContent({ section, lesson, prev, next }: Props) {
           Practice
         </h2>
         <VimEditor
+          key={section.id + lesson.id}
           initialText={lesson.exercise.initialText}
           instructions={lesson.exercise.instructions}
           hint={lesson.exercise.hint}
+          solution={lesson.exercise.solution}
+          onComplete={handleComplete}
+          onHintUsed={() => setHintsUsed(true)}
+          onReset={() => setResetsUsed(true)}
         />
       </div>
 

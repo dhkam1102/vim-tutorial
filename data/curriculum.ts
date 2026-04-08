@@ -16,6 +16,7 @@ export type Lesson = {
     initialText: string
     instructions: string
     hint?: string
+    solution?: string
   }
 }
 

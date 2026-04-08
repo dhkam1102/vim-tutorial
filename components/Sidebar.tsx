@@ -6,7 +6,9 @@ import { useState } from 'react'
 import { curriculum } from '@/data/curriculum'
 import { useTheme } from '@/context/ThemeContext'
 import { usePreferences } from '@/context/PreferencesContext'
+import { useProgress } from '@/context/ProgressContext'
 import KeyBadge from './KeyBadge'
+import UserWidget from './UserWidget'
 
 function GearIcon() {
   return (
@@ -21,6 +23,7 @@ export default function Sidebar({ onCollapse }: { onCollapse?: () => void }) {
   const pathname = usePathname()
   const { theme, setTheme } = useTheme()
   const { fontSize, setFontSize, lineNumbers, setLineNumbers } = usePreferences()
+  const { getStars } = useProgress()
   const [settingsOpen, setSettingsOpen] = useState(false)
 
   return (
@@ -67,10 +70,20 @@ export default function Sidebar({ onCollapse }: { onCollapse?: () => void }) {
                         }`}
                       >
                         <span className="truncate">{lesson.title}</span>
-                        <span className="flex gap-1 shrink-0">
-                          {lesson.keys.slice(0, 3).map((k, i) => (
-                            <KeyBadge key={i} keyName={k} />
-                          ))}
+                        <span className="flex items-center gap-1 shrink-0">
+                          {(() => {
+                            const stars = getStars(section.id, lesson.id)
+                            if (stars !== null) {
+                              return (
+                                <span className="font-mono text-xs text-yellow-400">
+                                  {'★'.repeat(stars)}{'☆'.repeat(3 - stars)}
+                                </span>
+                              )
+                            }
+                            return lesson.keys.slice(0, 2).map((k, i) => (
+                              <KeyBadge key={i} keyName={k} />
+                            ))
+                          })()}
                         </span>
                       </Link>
                     </li>
@@ -151,6 +164,9 @@ export default function Sidebar({ onCollapse }: { onCollapse?: () => void }) {
           </div>
         </div>
       )}
+
+      {/* User widget */}
+      <UserWidget />
 
       {/* Gear button — pinned at bottom */}
       <div className="border-t border-[var(--border)] px-4 py-3 shrink-0">
