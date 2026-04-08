@@ -1,11 +1,14 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { EditorState } from '@codemirror/state'
 import { EditorView, keymap, lineNumbers, highlightActiveLine } from '@codemirror/view'
 import { defaultKeymap, historyKeymap, history } from '@codemirror/commands'
-import { vim } from '@replit/codemirror-vim'
+import { vim, getCM } from '@replit/codemirror-vim'
 import { oneDark } from '@codemirror/theme-one-dark'
+import { python } from '@codemirror/lang-python'
+import { useTheme } from '@/context/ThemeContext'
+import { usePreferences, EDITOR_HEIGHT_MAP } from '@/context/PreferencesContext'
 
 type VimEditorProps = {
   initialText: string
@@ -17,42 +20,104 @@ export default function VimEditor({ initialText, instructions, hint }: VimEditor
   const containerRef = useRef<HTMLDivElement>(null)
   const viewRef = useRef<EditorView | null>(null)
   const [showHint, setShowHint] = useState(false)
-  const [mode, setMode] = useState('NORMAL')
+  const [mode, setMode] = useState('NAV')
+  const { theme } = useTheme()
+  const { editorHeight, fontSize, lineNumbers: showLineNumbers } = usePreferences()
+
+  const [height, setHeight] = useState(EDITOR_HEIGHT_MAP[editorHeight])
+  const isDragging = useRef(false)
+  const dragStartY = useRef(0)
+  const dragStartHeight = useRef(0)
+
+  useEffect(() => {
+    setHeight(EDITOR_HEIGHT_MAP[editorHeight])
+  }, [editorHeight])
+
+  const onDragMouseDown = useCallback((e: React.MouseEvent) => {
+    isDragging.current = true
+    dragStartY.current = e.clientY
+    dragStartHeight.current = height
+    document.body.style.cursor = 'row-resize'
+    document.body.style.userSelect = 'none'
+  }, [height])
+
+  useEffect(() => {
+    function onMouseMove(e: MouseEvent) {
+      if (!isDragging.current) return
+      const delta = e.clientY - dragStartY.current
+      setHeight(Math.max(100, dragStartHeight.current + delta))
+    }
+    function onMouseUp() {
+      if (!isDragging.current) return
+      isDragging.current = false
+      document.body.style.cursor = ''
+      document.body.style.userSelect = ''
+    }
+    window.addEventListener('mousemove', onMouseMove)
+    window.addEventListener('mouseup', onMouseUp)
+    return () => {
+      window.removeEventListener('mousemove', onMouseMove)
+      window.removeEventListener('mouseup', onMouseUp)
+    }
+  }, [])
 
   useEffect(() => {
     if (!containerRef.current) return
 
     const modeDisplay = EditorView.updateListener.of((update) => {
-      const vimState = (update.state as any).field?.vim
-      if (vimState) {
-        const m = vimState.insertMode ? 'INSERT' : vimState.visualMode ? 'VISUAL' : 'NORMAL'
-        setMode(m)
+      const cm = getCM(update.view)
+      if (cm) {
+        const vimState = cm.state.vim
+        if (vimState) {
+          const m = vimState.insertMode ? 'EDIT' : vimState.visualMode ? 'SELECT' : 'NAV'
+          setMode(m)
+        }
       }
+    })
+
+    const isDark = theme === 'dark'
+
+    const lightTheme = EditorView.theme({
+      '&': {
+        fontSize: `${fontSize}px`,
+        fontFamily: 'var(--font-mono), "JetBrains Mono", monospace',
+        backgroundColor: '#ffffff',
+      },
+      '.cm-content': { padding: '16px 0' },
+      '.cm-line': { padding: '0 16px', lineHeight: '1.7', color: '#1a1e2e' },
+      '.cm-gutters': { backgroundColor: '#f0f2f8', borderRight: '1px solid #cdd4ea', color: '#a8b2d0' },
+      '.cm-activeLineGutter': { backgroundColor: '#dde2f0' },
+      '.cm-activeLine': { backgroundColor: '#dde2f0' },
+      '.cm-cursor': { borderLeftColor: '#0d9b84', borderLeftWidth: '2px' },
+      '.cm-focused': { outline: 'none' },
+      '.cm-selectionBackground': { backgroundColor: '#cdd4ea !important' },
+    })
+
+    const darkTheme = EditorView.theme({
+      '&': {
+        fontSize: `${fontSize}px`,
+        fontFamily: 'var(--font-mono), "JetBrains Mono", monospace',
+        backgroundColor: '#1a1e2e',
+      },
+      '.cm-content': { padding: '16px 0' },
+      '.cm-line': { padding: '0 16px', lineHeight: '1.7' },
+      '.cm-gutters': { backgroundColor: '#161a28', borderRight: '1px solid #2e3450' },
+      '.cm-activeLineGutter': { backgroundColor: '#1e2436' },
+      '.cm-activeLine': { backgroundColor: '#1e2436' },
+      '.cm-cursor': { borderLeftColor: '#4ec9b0', borderLeftWidth: '2px' },
+      '.cm-focused': { outline: 'none' },
     })
 
     const state = EditorState.create({
       doc: initialText,
       extensions: [
         vim(),
+        python(),
         history(),
-        lineNumbers(),
+        ...(showLineNumbers ? [lineNumbers()] : []),
         highlightActiveLine(),
-        oneDark,
+        ...(isDark ? [oneDark, darkTheme] : [lightTheme]),
         keymap.of([...defaultKeymap, ...historyKeymap]),
-        EditorView.theme({
-          '&': {
-            fontSize: '16px',
-            fontFamily: 'var(--font-mono), "JetBrains Mono", monospace',
-            backgroundColor: '#1a1e2e',
-          },
-          '.cm-content': { padding: '16px 0' },
-          '.cm-line': { padding: '0 16px', lineHeight: '1.7' },
-          '.cm-gutters': { backgroundColor: '#161a28', borderRight: '1px solid #2e3450' },
-          '.cm-activeLineGutter': { backgroundColor: '#1e2436' },
-          '.cm-activeLine': { backgroundColor: '#1e2436' },
-          '.cm-cursor': { borderLeftColor: '#4ec9b0', borderLeftWidth: '2px' },
-          '.cm-focused': { outline: 'none' },
-        }),
         modeDisplay,
       ],
     })
@@ -69,7 +134,7 @@ export default function VimEditor({ initialText, instructions, hint }: VimEditor
       view.destroy()
       viewRef.current = null
     }
-  }, [initialText])
+  }, [initialText, theme, fontSize, showLineNumbers])
 
   function handleReset() {
     if (!viewRef.current) return
@@ -84,43 +149,51 @@ export default function VimEditor({ initialText, instructions, hint }: VimEditor
   }
 
   return (
-    <div className="rounded-lg overflow-hidden border border-[#2e3450]">
+    <div className="rounded-lg overflow-hidden border border-[var(--border)]">
       {/* Instructions bar */}
-      <div className="bg-[#1e2436] px-4 py-3 border-b border-[#2e3450]">
-        <p className="font-mono text-base text-[#9aa0c0]">
-          <span className="text-[#4ec9b0] font-semibold">Exercise: </span>
+      <div className="bg-[var(--bg-surface)] px-4 py-3 border-b border-[var(--border)]">
+        <p className="font-mono text-base text-[var(--text-secondary)]">
+          <span className="text-[var(--accent)] font-semibold">Exercise: </span>
           {instructions}
         </p>
       </div>
 
       {/* Editor */}
-      <div ref={containerRef} className="min-h-[200px]" />
+      <div ref={containerRef} style={{ height: `${height}px`, overflow: 'auto' }} />
+
+      {/* Drag handle */}
+      <div
+        onMouseDown={onDragMouseDown}
+        className="h-2 bg-[var(--bg-base)] border-t border-[var(--border)] cursor-row-resize flex items-center justify-center group"
+      >
+        <div className="w-8 h-0.5 rounded-full bg-[var(--border)] group-hover:bg-[var(--accent)] transition-colors" />
+      </div>
 
       {/* Status bar */}
-      <div className="bg-[#161a28] px-4 py-2 border-t border-[#2e3450] flex items-center justify-between">
+      <div className="bg-[var(--bg-base)] px-4 py-2 border-t border-[var(--border)] flex items-center justify-between">
         <span
           className={`font-mono text-xs px-2 py-0.5 rounded font-bold ${
-            mode === 'INSERT'
-              ? 'bg-[#4ec9b0] text-[#161a28]'
-              : mode === 'VISUAL'
+            mode === 'EDIT'
+              ? 'bg-[var(--accent)] text-[var(--accent-text)]'
+              : mode === 'SELECT'
               ? 'bg-purple-500 text-white'
-              : 'bg-[#2e3450] text-[#9aa0c0]'
+              : 'bg-[var(--bg-active)] text-[var(--text-secondary)]'
           }`}
         >
-          -- {mode} --
+          {mode}
         </span>
         <div className="flex gap-3">
           {hint && (
             <button
               onClick={() => setShowHint((v) => !v)}
-              className="font-mono text-xs text-[#9aa0c0] hover:text-white transition-colors"
+              className="font-mono text-xs text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors"
             >
               {showHint ? 'hide hint' : 'show hint'}
             </button>
           )}
           <button
             onClick={handleReset}
-            className="font-mono text-xs text-[#9aa0c0] hover:text-[#4ec9b0] transition-colors"
+            className="font-mono text-xs text-[var(--text-secondary)] hover:text-[var(--accent)] transition-colors"
           >
             reset
           </button>
@@ -129,9 +202,9 @@ export default function VimEditor({ initialText, instructions, hint }: VimEditor
 
       {/* Hint */}
       {showHint && hint && (
-        <div className="bg-[#1e2436] border-t border-[#2e3450] px-4 py-2">
-          <p className="font-mono text-xs text-[#9aa0c0]">
-            <span className="text-yellow-400">Hint: </span>
+        <div className="bg-[var(--bg-surface)] border-t border-[var(--border)] px-4 py-2">
+          <p className="font-mono text-xs text-[var(--text-secondary)]">
+            <span className="text-yellow-500">Hint: </span>
             {hint}
           </p>
         </div>

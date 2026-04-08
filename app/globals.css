@@ -1,14 +1,46 @@
 @import "tailwindcss";
 
-:root {
-  --background: #161a28;
-  --foreground: #c8cce8;
+:root,
+[data-theme="dark"] {
+  --bg-base: #161a28;
+  --bg-sidebar: #1a1e2e;
+  --bg-surface: #1e2436;
+  --bg-hover: #252a3a;
+  --bg-active: #2e3450;
+  --border: #2e3450;
+  --border-subtle: #4a5180;
+  --text-primary: #ffffff;
+  --text-secondary: #9aa0c0;
+  --text-muted: #c8cce8;
+  --accent: #4ec9b0;
+  --accent-hover: #3ab89f;
+  --accent-text: #161a28;
+  --badge-bg: #3a4060;
+  --font-mono: "Geist Mono", monospace;
+}
+
+[data-theme="light"] {
+  --bg-base: #f0f2f8;
+  --bg-sidebar: #e4e8f5;
+  --bg-surface: #ffffff;
+  --bg-hover: #dde2f0;
+  --bg-active: #cdd4ea;
+  --border: #cdd4ea;
+  --border-subtle: #a8b2d0;
+  --text-primary: #1a1e2e;
+  --text-secondary: #4a5270;
+  --text-muted: #3a4060;
+  --accent: #0d9b84;
+  --accent-hover: #0b8a75;
+  --accent-text: #ffffff;
+  --badge-bg: #d4d9ee;
   --font-mono: "Geist Mono", monospace;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
+  background: var(--bg-base);
+  color: var(--text-secondary);
+  transition: background 0.15s, color 0.15s;
 }
 
 /* CodeMirror scrollbar styling */
@@ -17,9 +49,9 @@ body {
   height: 6px;
 }
 .cm-scroller::-webkit-scrollbar-track {
-  background: #161a28;
+  background: var(--bg-base);
 }
 .cm-scroller::-webkit-scrollbar-thumb {
-  background: #2e3450;
+  background: var(--bg-active);
   border-radius: 3px;
 }
