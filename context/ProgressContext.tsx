@@ -14,7 +14,7 @@ type ProgressMap = Record<string, LessonProgress>
 
 type ProgressContextType = {
   progress: ProgressMap
-  recordCompletion: (sectionId: string, lessonId: string, hintsUsed: boolean, resetsUsed: boolean) => void
+  recordCompletion: (sectionId: string, lessonId: string, stars: 1 | 2 | 3) => void
   getStars: (sectionId: string, lessonId: string) => 1 | 2 | 3 | null
 }
 
@@ -63,19 +63,18 @@ export function ProgressProvider({ children }: { children: React.ReactNode }) {
       .catch(() => {})
   }, [session?.user?.id])
 
-  function recordCompletion(sectionId: string, lessonId: string, hintsUsed: boolean, resetsUsed: boolean) {
+  function recordCompletion(sectionId: string, lessonId: string, stars: 1 | 2 | 3) {
     const key = `${sectionId}::${lessonId}`
-    const newStars = calcStars(hintsUsed, resetsUsed)
 
     setProgress((prev) => {
       const existing = prev[key]
-      if (existing && existing.stars >= newStars) return prev
+      if (existing && existing.stars >= stars) return prev
 
       const entry: LessonProgress = {
-        stars: newStars,
+        stars,
         completedAt: new Date().toISOString(),
-        hintsUsed,
-        resetsUsed,
+        hintsUsed: false,
+        resetsUsed: false,
       }
       const next = { ...prev, [key]: entry }
       localStorage.setItem(STORAGE_KEY, JSON.stringify(next))
@@ -84,7 +83,7 @@ export function ProgressProvider({ children }: { children: React.ReactNode }) {
         fetch('/api/progress', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ sectionId, lessonId, stars: newStars, hintsUsed, resetsUsed }),
+          body: JSON.stringify({ sectionId, lessonId, stars, hintsUsed: false, resetsUsed: false }),
         }).catch(() => {})
       }
 

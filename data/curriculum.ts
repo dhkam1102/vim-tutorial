@@ -6,6 +6,16 @@ export type DemoStep = {
   description: string                   // explanation shown below the editor
 }
 
+export type NavigationTarget = {
+  target: [number, number]
+  idealKeystrokes: number
+}
+
+export type ExerciseGoal =
+  | { type: 'mode-sequence'; sequence: ('NORMAL' | 'INSERT' | 'VISUAL')[]; reps: number }
+  | { type: 'cursor-reach'; targets: NavigationTarget[] }
+  | { type: 'manual' }
+
 export type Lesson = {
   id: string
   title: string
@@ -16,7 +26,7 @@ export type Lesson = {
     initialText: string
     instructions: string
     hint?: string
-    solution?: string
+    goal?: ExerciseGoal
   }
 }
 
@@ -73,6 +83,7 @@ export const curriculum: Section[] = [
 # Press Esc to return to Normal mode.`,
           instructions: 'Press i to enter Insert mode, add a word anywhere, then press Esc to return to Normal mode.',
           hint: 'i enters Insert mode. Esc exits back to Normal mode.',
+          goal: { type: 'mode-sequence', sequence: ['INSERT', 'NORMAL'], reps: 1 },
         },
       },
       {
@@ -96,6 +107,16 @@ score = 95
 active = True`,
           instructions: 'Navigate to "five" on the last line using j (down) and l (right). Do not use arrow keys.',
           hint: 'Press j to move down, l to move right.',
+          goal: { type: 'cursor-reach', targets: [
+            { target: [0, 7], idealKeystrokes: 7 },
+            { target: [2, 7], idealKeystrokes: 2 },
+            { target: [2, 0], idealKeystrokes: 7 },
+            { target: [4, 0], idealKeystrokes: 2 },
+            { target: [4, 7], idealKeystrokes: 7 },
+            { target: [4, 9], idealKeystrokes: 2 },
+            { target: [3, 9], idealKeystrokes: 1 },
+            { target: [3, 0], idealKeystrokes: 9 },
+          ] },
         },
       },
       {
@@ -117,6 +138,16 @@ count = 42
 message = greeting + str(count)`,
           instructions: 'Starting at the beginning, use w to jump forward word by word to reach "World". Then use b to go back to "Hello".',
           hint: 'w moves forward one word at a time. b moves backward.',
+          goal: { type: 'cursor-reach', targets: [
+            { target: [0, 9], idealKeystrokes: 1 },
+            { target: [0, 11], idealKeystrokes: 1 },
+            { target: [0, 12], idealKeystrokes: 1 },
+            { target: [0, 16], idealKeystrokes: 1 },
+            { target: [0, 17], idealKeystrokes: 1 },
+            { target: [0, 12], idealKeystrokes: 1 },
+            { target: [0, 11], idealKeystrokes: 1 },
+            { target: [0, 9], idealKeystrokes: 1 },
+          ] },
         },
       },
       {
@@ -136,6 +167,7 @@ message = greeting + str(count)`,
 name = ""`,
           instructions: 'Use i or a to insert "World" after the comma on line 1, and your name on line 2.',
           hint: 'Move to the ! on line 1, press i, type "World", press Esc.',
+          goal: { type: 'mode-sequence', sequence: ['INSERT', 'NORMAL'], reps: 2 },
         },
       },
     ],
@@ -162,6 +194,7 @@ name = ""`,
     return "done"`,
           instructions: 'Go to line 2. Use A to append a semicolon at the end of the console.log line.',
           hint: 'Move to line 2 with j, then press A and type ;',
+          goal: { type: 'mode-sequence', sequence: ['INSERT', 'NORMAL'], reps: 2 },
         },
       },
       {
@@ -181,6 +214,7 @@ name = ""`,
 z = 3`,
           instructions: 'Place your cursor on "First line" and press o to open a new line below it. Type "Second line".',
           hint: 'Press o while on line 1, type "Second line", then Esc.',
+          goal: { type: 'mode-sequence', sequence: ['INSERT', 'NORMAL'], reps: 3 },
         },
       },
       {
@@ -200,6 +234,7 @@ z = 3`,
 primt(mesage)`,
           instructions: 'Fix the typos: "Hellp" → "Hello", "iz" → "is", "testt" → "test". Use r to replace single characters and x to delete extras.',
           hint: 'Move to the p in "Hellp", press r then o. Move to z, press r then s. Move to the extra t, press x.',
+          goal: { type: 'manual' },
         },
       },
     ],
@@ -225,6 +260,16 @@ primt(mesage)`,
 response = requests.get(url).json()`,
           instructions: 'Use W to jump over the full URL token "https://example.com/api/v1" in one move. Compare with w which stops at each punctuation.',
           hint: 'Position cursor at "https", press W to skip the whole WORD.',
+          goal: { type: 'cursor-reach', targets: [
+            { target: [0, 4], idealKeystrokes: 1 },
+            { target: [0, 6], idealKeystrokes: 1 },
+            { target: [1, 0], idealKeystrokes: 1 },
+            { target: [1, 9], idealKeystrokes: 1 },
+            { target: [1, 11], idealKeystrokes: 1 },
+            { target: [1, 9], idealKeystrokes: 1 },
+            { target: [1, 0], idealKeystrokes: 1 },
+            { target: [0, 6], idealKeystrokes: 1 },
+          ] },
         },
       },
       {
@@ -245,6 +290,16 @@ response = requests.get(url).json()`,
     z = x + y`,
           instructions: 'On line 1, press $ to go to the end, then 0 to go to column 0, then _ to go to "const".',
           hint: '$ = end of line, 0 = column 0, _ = first non-blank char',
+          goal: { type: 'cursor-reach', targets: [
+            { target: [0, 9], idealKeystrokes: 1 },
+            { target: [0, 4], idealKeystrokes: 1 },
+            { target: [0, 0], idealKeystrokes: 1 },
+            { target: [1, 9], idealKeystrokes: 2 },
+            { target: [1, 4], idealKeystrokes: 1 },
+            { target: [1, 0], idealKeystrokes: 1 },
+            { target: [2, 12], idealKeystrokes: 2 },
+            { target: [2, 4], idealKeystrokes: 1 },
+          ] },
         },
       },
       {
@@ -264,6 +319,16 @@ response = requests.get(url).json()`,
     return price + tax - discount`,
           instructions: 'On line 1, press f( to jump to the opening parenthesis. Then press ; to jump to the next comma.',
           hint: 'f( jumps to (, then ; repeats to find the next match.',
+          goal: { type: 'cursor-reach', targets: [
+            { target: [0, 4], idealKeystrokes: 1 },
+            { target: [0, 7], idealKeystrokes: 1 },
+            { target: [0, 23], idealKeystrokes: 1 },
+            { target: [0, 35], idealKeystrokes: 1 },
+            { target: [0, 23], idealKeystrokes: 1 },
+            { target: [0, 7], idealKeystrokes: 1 },
+            { target: [0, 4], idealKeystrokes: 1 },
+            { target: [0, 25], idealKeystrokes: 1 },
+          ] },
         },
       },
       {
@@ -282,6 +347,16 @@ response = requests.get(url).json()`,
           initialText: `result = do_something(value, callback)`,
           instructions: 'Use t) to move just before the closing parenthesis. Notice the cursor stops one character before ) unlike f).',
           hint: 't) stops before the ), f) stops on the ).',
+          goal: { type: 'cursor-reach', targets: [
+            { target: [0, 20], idealKeystrokes: 1 },
+            { target: [0, 26], idealKeystrokes: 1 },
+            { target: [0, 36], idealKeystrokes: 1 },
+            { target: [0, 28], idealKeystrokes: 1 },
+            { target: [0, 22], idealKeystrokes: 1 },
+            { target: [0, 26], idealKeystrokes: 1 },
+            { target: [0, 36], idealKeystrokes: 1 },
+            { target: [0, 8], idealKeystrokes: 1 },
+          ] },
         },
       },
     ],
@@ -308,6 +383,7 @@ change this word too
 yank this line`,
           instructions: 'Read this lesson — the next lessons will practice each operator. For now, try dw on "entire" to delete it.',
           hint: 'Move to "entire", press dw to delete the word.',
+          goal: { type: 'manual' },
         },
       },
       {
@@ -326,6 +402,7 @@ yank this line`,
 Also delete these three unnecessary filler words here.`,
           instructions: 'On line 1, delete the duplicate "extra" using dw. On line 2, delete "unnecessary filler words" (try 3dw or d3w).',
           hint: 'Position on first "extra", press dw. Then find "unnecessary", press 3dw.',
+          goal: { type: 'manual' },
         },
       },
       {
@@ -345,6 +422,7 @@ Also delete these three unnecessary filler words here.`,
 baz = 100`,
           instructions: 'Change "foo" to "message" using cw. Change "baz" to "count" using cw.',
           hint: 'Move to "foo", press cw, type "message", Esc. Repeat for "baz".',
+          goal: { type: 'manual' },
         },
       },
       {
@@ -366,6 +444,7 @@ age = 30
 active = True`,
           instructions: 'Delete the two lines that say "DELETE" using dd. The other lines should remain.',
           hint: 'Move to "DELETE THIS LINE", press dd. Move to the next DELETE line, press dd.',
+          goal: { type: 'manual' },
         },
       },
       {
@@ -386,6 +465,7 @@ w = 4          # delete
 total = x + w  # keep`,
           instructions: 'Delete lines 2, 3, and 4 in one command. Position on line 2 and use d2j (or 3dd).',
           hint: 'Move to "Line 2", press d2j to delete it and 2 lines below.',
+          goal: { type: 'manual' },
         },
       },
       {
@@ -407,6 +487,7 @@ total = x + w  # keep`,
 # paste it above this comment`,
           instructions: 'Yank the PI line with yy, then paste it below the first comment with p, and above the second comment with P.',
           hint: 'Move to the PI line, press yy, move to comment line, press p for below or P for above.',
+          goal: { type: 'manual' },
         },
       },
     ],
@@ -439,6 +520,16 @@ debug = False
 verbose = True`,
           instructions: 'From line 1, jump to line 7 with 6j. Then jump back to line 3 with 4k.',
           hint: '6j jumps 6 lines down, 4k jumps 4 lines up.',
+          goal: { type: 'cursor-reach', targets: [
+            { target: [6, 0], idealKeystrokes: 2 },
+            { target: [3, 0], idealKeystrokes: 2 },
+            { target: [8, 0], idealKeystrokes: 2 },
+            { target: [5, 0], idealKeystrokes: 2 },
+            { target: [9, 0], idealKeystrokes: 2 },
+            { target: [4, 0], idealKeystrokes: 2 },
+            { target: [7, 0], idealKeystrokes: 2 },
+            { target: [2, 0], idealKeystrokes: 2 },
+          ] },
         },
       },
       {
@@ -466,6 +557,16 @@ import argparse
 import subprocess  # bottom of file`,
           instructions: 'Press G to jump to the last line. Then press gg to return to the top. Then press 5G to jump to line 5.',
           hint: 'G = last line, gg = first line, 5G = line 5.',
+          goal: { type: 'cursor-reach', targets: [
+            { target: [9, 0], idealKeystrokes: 1 },
+            { target: [0, 0], idealKeystrokes: 2 },
+            { target: [4, 0], idealKeystrokes: 2 },
+            { target: [9, 0], idealKeystrokes: 1 },
+            { target: [2, 0], idealKeystrokes: 2 },
+            { target: [0, 0], idealKeystrokes: 2 },
+            { target: [6, 0], idealKeystrokes: 2 },
+            { target: [9, 0], idealKeystrokes: 1 },
+          ] },
         },
       },
       {
@@ -493,6 +594,16 @@ def teardown():
     cleanup()`,
           instructions: 'Press } to jump between paragraphs (blank lines). Press { to go back up.',
           hint: '} moves to next blank line, { moves to previous blank line.',
+          goal: { type: 'cursor-reach', targets: [
+            { target: [3, 0], idealKeystrokes: 1 },
+            { target: [7, 0], idealKeystrokes: 1 },
+            { target: [3, 0], idealKeystrokes: 1 },
+            { target: [0, 0], idealKeystrokes: 1 },
+            { target: [3, 0], idealKeystrokes: 1 },
+            { target: [7, 0], idealKeystrokes: 1 },
+            { target: [3, 0], idealKeystrokes: 1 },
+            { target: [0, 0], idealKeystrokes: 1 },
+          ] },
         },
       },
       {
@@ -510,6 +621,7 @@ def teardown():
           initialText: Array.from({ length: 40 }, (_, i) => `x_${i + 1} = ${(i + 1) * 7}  # variable ${i + 1}`).join('\n'),
           instructions: 'Press Ctrl+d to scroll down half a page. Press Ctrl+u to scroll back up.',
           hint: 'Hold Ctrl and press d to scroll down, u to scroll up.',
+          goal: { type: 'manual' },
         },
       },
     ],
@@ -537,6 +649,7 @@ def teardown():
     return message`,
           instructions: 'Press / then type "message" and press Enter to search for it. Watch the cursor jump to the first match.',
           hint: 'Type /message then Enter.',
+          goal: { type: 'manual' },
         },
       },
       {
@@ -552,6 +665,7 @@ print(count, total)
 return count`,
           instructions: 'Search for "count" with /count Enter. Then press n to jump to each occurrence. Press N to go backward.',
           hint: 'After /count Enter, press n repeatedly to cycle through matches.',
+          goal: { type: 'manual' },
         },
         demo: [
           { mode: 'NORMAL', text: 'count = 1\ntotal = count + count\nprint(count, total)\nreturn count', cursor: [0, 0], description: 'count appears 4 times in this file.' },
@@ -574,6 +688,7 @@ if user:
     print(user.name)`,
           instructions: 'Place your cursor on the word "user" and press * to find all occurrences. Press n to jump between them.',
           hint: 'Move to "user", press *, then n to cycle through.',
+          goal: { type: 'manual' },
         },
         demo: [
           { mode: 'NORMAL', text: 'user = get_user(id)\nif user:\n    update_user(user)\n    print(user.name)', cursor: [0, 0], description: 'Cursor is on "user".' },
@@ -597,6 +712,7 @@ if user:
     return result`,
           instructions: 'Search for "error", jump through all matches with n, then use * on "result" to quickly find all its occurrences.',
           hint: '/error Enter, then n to cycle. Move to "result", press *.',
+          goal: { type: 'manual' },
         },
         demo: [
           { mode: 'NORMAL', text: 'def process_data(data):\n    result = transform(data)\n    error = validate(result)\n    if error:\n        handle_error(error)\n    return result', cursor: [0, 0], description: 'Starting at the top.' },
@@ -622,6 +738,7 @@ if user:
 print(config)`,
           instructions: 'Read this introduction. In the next lessons you\'ll practice di{, da{, ci{, ca{. For now, try positioning inside the { } on line 1.',
           hint: 'Move your cursor anywhere inside the { } on line 1.',
+          goal: { type: 'manual' },
         },
         demo: [
           { mode: 'NORMAL', text: 'config = {"name": "Alice", "age": 30}', cursor: [0, 10], description: 'Cursor inside the { } block.' },
@@ -644,6 +761,7 @@ print(config)`,
 }`,
           instructions: 'Place your cursor anywhere inside the function body and press di{ to delete everything between the braces.',
           hint: 'Move inside the {}, press di{ to delete contents but keep the braces.',
+          goal: { type: 'manual' },
         },
         demo: [
           { mode: 'NORMAL', text: 'config = {\n    "theme": "dark",\n    "language": "en",\n    "debug": True,\n}', cursor: [1, 4], description: 'Cursor anywhere inside { }.' },
@@ -663,6 +781,7 @@ print(config)`,
 }`,
           instructions: 'Place cursor inside the {} block and press da{ to delete the braces and their contents.',
           hint: 'Move inside {}, press da{ — it removes { ... } entirely.',
+          goal: { type: 'manual' },
         },
         demo: [
           { mode: 'NORMAL', text: 'settings = {\n    "host": "localhost",\n    "port": 8080,\n}', cursor: [1, 4], description: 'Cursor anywhere inside { }.' },
@@ -682,6 +801,7 @@ print(config)`,
 }`,
           instructions: 'Position inside the function body and press ci{ to clear it and enter Insert mode. Type a new body.',
           hint: 'Move inside {}, press ci{, type new content, press Esc.',
+          goal: { type: 'manual' },
         },
         demo: [
           { mode: 'NORMAL', text: 'user = {\n    "name": "old name",\n    "role": "guest",\n}', cursor: [1, 4], description: 'Cursor inside { }.' },
@@ -699,6 +819,7 @@ print(config)`,
           initialText: `result = calculate({"x": 1, "y": 2})`,
           instructions: 'Place cursor inside { x: 1, y: 2 } and press ca{ to delete the braces and content, then type { x: 5, y: 10 }.',
           hint: 'Move inside {}, press ca{, type new object literal, Esc.',
+          goal: { type: 'manual' },
         },
         demo: [
           { mode: 'NORMAL', text: 'result = calculate({"x": 1, "y": 2})', cursor: [0, 20], description: 'Cursor inside { }.' },
@@ -718,6 +839,7 @@ print(config)`,
     return {"result": data, "status": "ok"}`,
           instructions: 'Try di( on the function params, di[ on the array, and di{ on the return object. See the difference between each.',
           hint: 'Move inside (), press di(. Move inside [], press di[. Move inside {}, press di{.',
+          goal: { type: 'manual' },
         },
         demo: [
           { mode: 'NORMAL', text: 'def process(input):\n    data = transform([1, 2, 3])\n    return {"result": data}', cursor: [0, 12], description: 'Cursor inside ( ) params.' },
@@ -743,6 +865,7 @@ print(config)`,
 name = 'Alice'`,
           instructions: 'Place cursor anywhere on line 1 and press di" to delete the string contents (keep the quotes). Then di\' on line 2.',
           hint: 'di" removes content between " ". di\' removes content between \' \'.',
+          goal: { type: 'manual' },
         },
         demo: [
           { mode: 'NORMAL', text: 'greeting = "Hello, World!"\nname = \'Alice\'', cursor: [0, 12], description: 'Cursor anywhere on line 1.' },
@@ -761,6 +884,7 @@ name = 'Alice'`,
 url = "https://example.com"`,
           instructions: 'Press da" on line 1 to delete the entire "debug message" string including quotes.',
           hint: 'Move to line 1, press da" to remove "debug message" (with quotes).',
+          goal: { type: 'manual' },
         },
         demo: [
           { mode: 'NORMAL', text: 'print("debug message")\nurl = "https://example.com"', cursor: [0, 7], description: 'Cursor inside "debug message".' },
@@ -778,6 +902,7 @@ url = "https://example.com"`,
 author = "Unknown"`,
           instructions: 'Use ci" on line 1 to change "Old Title" to "New Title". Use ci" on line 2 to change "Unknown" to your name.',
           hint: 'Move to line 1, press ci", type new string, Esc.',
+          goal: { type: 'manual' },
         },
         demo: [
           { mode: 'NORMAL', text: 'title = "Old Title"\nauthor = "Unknown"', cursor: [0, 9], description: 'Cursor inside "Old Title".' },
@@ -795,6 +920,7 @@ author = "Unknown"`,
           initialText: `value = "replace me entirely"`,
           instructions: 'Press ca" to delete the whole "replace me entirely" (with quotes) and type a new value like 42 (no quotes needed).',
           hint: 'Press ca", type 42 or any replacement, press Esc.',
+          goal: { type: 'manual' },
         },
         demo: [
           { mode: 'NORMAL', text: 'value = "replace me entirely"', cursor: [0, 9], description: 'Cursor inside the string.' },
@@ -816,6 +942,7 @@ author = "Unknown"`,
 }`,
           instructions: 'Practice ci" on name, ci\' on greeting, and ci` on template. Change each string value.',
           hint: 'Move to each string, use the matching ci operator for that quote type.',
+          goal: { type: 'manual' },
         },
         demo: [
           { mode: 'NORMAL', text: 'data = {\n    "name": "Alice",\n    "greeting": \'Hello\',\n}', cursor: [1, 12], description: 'Cursor on "Alice" — double quotes.' },
@@ -841,6 +968,7 @@ author = "Unknown"`,
 This has an unwanted word in it.`,
           instructions: 'Move your cursor anywhere on "badword" and press diw to delete just that word.',
           hint: 'Move anywhere on "badword", press diw.',
+          goal: { type: 'manual' },
         },
         demo: [
           { mode: 'NORMAL', text: 'Remove the badword from this sentence.', cursor: [0, 11], description: 'Cursor anywhere on "badword".' },
@@ -857,6 +985,7 @@ This has an unwanted word in it.`,
           initialText: `Remove the extra badword from this sentence cleanly.`,
           instructions: 'Place cursor on "badword" and press daw. Notice it also removes the trailing space, unlike diw.',
           hint: 'daw removes word + surrounding space for clean deletion.',
+          goal: { type: 'manual' },
         },
         demo: [
           { mode: 'NORMAL', text: 'Remove the extra badword from this sentence cleanly.', cursor: [0, 17], description: 'Cursor on "badword".' },
@@ -876,6 +1005,7 @@ This has an unwanted word in it.`,
 another_thing = 100`,
           instructions: 'Use ciw to rename "myVariable" to "count" and "anotherThing" to "total".',
           hint: 'Move anywhere on "myVariable", press ciw, type "count", Esc. Repeat.',
+          goal: { type: 'manual' },
         },
         demo: [
           { mode: 'NORMAL', text: 'my_variable = get_value()\nanother_thing = 100', cursor: [0, 2], description: 'Cursor anywhere on "my_variable".' },
@@ -896,6 +1026,7 @@ another_thing = 100`,
     return subtotal - savings`,
           instructions: 'Use ciw to rename: "price" → "cost", "quantity" → "amount", "discount" → "reduction". Try to do it efficiently.',
           hint: 'Move to each word, press ciw, type the new name, Esc.',
+          goal: { type: 'manual' },
         },
         demo: [
           { mode: 'NORMAL', text: 'def calculate_total(price, quantity, discount):\n    subtotal = price * quantity', cursor: [0, 20], description: 'Cursor on "price" in params.' },
@@ -927,6 +1058,7 @@ def teardown():
     cleanup()`,
           instructions: 'Place cursor anywhere in the second paragraph and press dip to delete it, leaving the blank lines.',
           hint: 'Move to "Second paragraph", press dip.',
+          goal: { type: 'manual' },
         },
         demo: [
           { mode: 'NORMAL', text: 'def setup():\n    config = load_config()\n\ndef process():\n    result = run()\n    return result\n\ndef teardown():\n    cleanup()', cursor: [3, 0], description: 'Cursor in the process() paragraph.' },
@@ -951,6 +1083,7 @@ def save():
     write_file()`,
           instructions: 'Place cursor in the second paragraph and press dap. Notice it also removes the blank line.',
           hint: 'dap removes the paragraph and adjacent blank line.',
+          goal: { type: 'manual' },
         },
         demo: [
           { mode: 'NORMAL', text: 'def load():\n    return read_file()\n\ndef process():\n    data = fetch()\n    return transform(data)\n\ndef save():\n    write_file()', cursor: [3, 0], description: 'Cursor in the process() paragraph.' },
@@ -978,6 +1111,7 @@ def finish():
     done()`,
           instructions: 'Place cursor in the body paragraph and press cip to replace it. Type some new content.',
           hint: 'Move to "Body paragraph", press cip, type new text, Esc.',
+          goal: { type: 'manual' },
         },
         demo: [
           { mode: 'NORMAL', text: 'def init():\n    setup()\n\ndef main():\n    data = load()\n    result = process(data)\n    return result\n\ndef finish():\n    done()', cursor: [4, 0], description: 'Cursor in the main() paragraph.' },
@@ -1003,6 +1137,7 @@ def footer():
     return render_footer()`,
           instructions: 'Use dip to delete the "Main section" block, and cip to replace the "Footer section" block with new text.',
           hint: 'dip on main block, then cip on footer block.',
+          goal: { type: 'manual' },
         },
         demo: [
           { mode: 'NORMAL', text: 'def header():\n    return render_header()\n\ndef body():\n    items = get_items()\n    return render_items(items)\n\ndef footer():\n    return render_footer()', cursor: [3, 0], description: 'Cursor in body() paragraph.' },
@@ -1034,6 +1169,7 @@ def footer():
         return {"name": name, "tags": tags, "config": config}`,
           instructions: 'Practice a variety of text objects: ci" on "John Doe", di[ on the tags array contents, da{ on the config object, cip on the if block.',
           hint: 'ci" = change string, di[ = delete inside [], da{ = delete around {}, cip = change paragraph.',
+          goal: { type: 'manual' },
         },
         demo: [
           { mode: 'NORMAL', text: 'def process_user(user_data):\n    name = "John Doe"\n    tags = ["admin", "editor"]\n    config = {"theme": "dark"}', cursor: [1, 11], description: 'Cursor inside "John Doe".' },
@@ -1059,6 +1195,7 @@ def footer():
 Then try selecting a whole phrase.`,
           instructions: 'Press v to enter Visual mode, then use l to extend the selection rightward, or w to select word by word. Press Esc to cancel.',
           hint: 'v enters visual mode, move cursor to expand selection, Esc to cancel.',
+          goal: { type: 'mode-sequence', sequence: ['VISUAL', 'NORMAL'], reps: 1 },
         },
         demo: [
           { mode: 'NORMAL', text: 'Select this word carefully.\nThen try selecting a whole phrase.', cursor: [0, 0], description: 'Normal mode — cursor on "S".' },
@@ -1079,6 +1216,7 @@ Then try selecting a whole phrase.`,
 Copy this phrase and paste it below.`,
           instructions: 'On line 1: press v, select "middle portion", press d to delete. On line 2: select "this phrase", press y, then p to paste.',
           hint: 'v → select → d (delete) or y (yank) → p (paste)',
+          goal: { type: 'mode-sequence', sequence: ['VISUAL', 'NORMAL'], reps: 2 },
         },
         demo: [
           { mode: 'NORMAL', text: 'Delete this middle portion of the line.\nCopy this phrase and paste it below.', cursor: [0, 7], description: 'Cursor on "this".' },
@@ -1097,6 +1235,7 @@ Copy this phrase and paste it below.`,
           initialText: `Select from here all the way to the end of this line.`,
           instructions: 'Press v, select some text, then press o to switch which end is active. Extend from the other side.',
           hint: 'v → select → o to toggle active end of selection.',
+          goal: { type: 'mode-sequence', sequence: ['VISUAL', 'NORMAL'], reps: 3 },
         },
         demo: [
           { mode: 'NORMAL', text: 'Select from here all the way to the end of this line.', cursor: [0, 7], description: 'Cursor on "from".' },
@@ -1120,6 +1259,7 @@ Line D - select this
 Line E - keep`,
           instructions: 'Press V to enter Visual Line mode on line B, then press 2j to extend to line D, then press d to delete all three lines.',
           hint: 'V enters line visual mode, 2j extends 2 lines down, d deletes.',
+          goal: { type: 'mode-sequence', sequence: ['VISUAL', 'NORMAL'], reps: 2 },
         },
         demo: [
           { mode: 'NORMAL', text: 'Line A - keep\nLine B - select this\nLine C - select this\nLine D - select this\nLine E - keep', cursor: [1, 0], description: 'Cursor on Line B.' },
@@ -1142,6 +1282,7 @@ Middle line C
 Bottom line`,
           instructions: 'Press V on "Middle line B", extend up with k, press o, then extend down with j. Notice how o switches which end moves.',
           hint: 'V → extend → o to switch active end.',
+          goal: { type: 'mode-sequence', sequence: ['VISUAL', 'NORMAL'], reps: 3 },
         },
         demo: [
           { mode: 'NORMAL', text: 'Top line\nMiddle line A\nMiddle line B\nMiddle line C\nBottom line', cursor: [2, 0], description: 'Cursor on Middle line B.' },
@@ -1165,6 +1306,7 @@ def second():
     return 2`,
           instructions: 'Use V + j to select the "first" function (3 lines), yank with y, then paste it below the "second" function with p.',
           hint: 'V on "function first", 2j to extend, y to yank, move below second function, p to paste.',
+          goal: { type: 'mode-sequence', sequence: ['VISUAL', 'NORMAL'], reps: 2 },
         },
         demo: [
           { mode: 'NORMAL', text: 'def first():\n    return 1\n\ndef second():\n    return 2', cursor: [0, 0], description: 'Cursor on first() function.' },
@@ -1192,6 +1334,7 @@ age = 999
 city = "NYC"`,
           instructions: 'Delete line 2 with dd, then press u to undo it back. Press Ctrl+r to redo the deletion.',
           hint: 'dd deletes, u undoes, Ctrl+r redoes.',
+          goal: { type: 'manual' },
         },
         demo: [
           { mode: 'NORMAL', text: 'name = "Alice"\nage = 999\ncity = "NYC"', cursor: [1, 0], description: 'Cursor on line 2.' },
@@ -1210,6 +1353,7 @@ city = "NYC"`,
           initialText: `result = calculate_total(price, tax, discount)`,
           instructions: 'Make a few edits on the line (use r, x, or i). Then press U to undo all changes to that line at once.',
           hint: 'Edit the line a few times, then press U to restore the whole line.',
+          goal: { type: 'manual' },
         },
         demo: [
           { mode: 'NORMAL', text: 'result = calculate_total(price, tax, discount)', cursor: [0, 0], description: 'Original line.' },
@@ -1241,6 +1385,7 @@ city = "NYC"
 # Jump back to the mark`,
           instructions: 'Press ma on line 1 to set mark a. Navigate down a few lines. Press \'a to jump back to the marked line.',
           hint: 'ma sets the mark, \'a jumps back to it.',
+          goal: { type: 'manual' },
         },
         demo: [
           { mode: 'NORMAL', text: "# Mark this line as 'a'\nname = \"Alice\"\n\n# Navigate away...\nage = 30\ncity = \"NYC\"", cursor: [0, 0], description: 'Cursor on line 1.' },
@@ -1267,6 +1412,7 @@ def process():
 result = process()`,
           instructions: 'Press G to jump to the bottom, then gg to go to the top, then search /Middle. Now press Ctrl+o to go back through your jump history.',
           hint: 'Make several jumps (G, gg, /search), then Ctrl+o to walk back through them.',
+          goal: { type: 'manual' },
         },
         demo: [
           { mode: 'NORMAL', text: '# Start here at the top\nimport os\n\n# Middle of the file\ndef process():\n    pass\n\n# End of the file\nresult = process()', cursor: [0, 0], description: 'At the top of the file.' },

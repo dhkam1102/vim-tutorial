@@ -1,21 +1,56 @@
 'use client'
 
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { EditorState } from '@codemirror/state'
-import { EditorView, keymap, lineNumbers, highlightActiveLine } from '@codemirror/view'
+import { EditorState, StateField, StateEffect, RangeSet } from '@codemirror/state'
+import { EditorView, keymap, lineNumbers, highlightActiveLine, Decoration, DecorationSet } from '@codemirror/view'
 import { defaultKeymap, historyKeymap, history } from '@codemirror/commands'
 import { vim, getCM } from '@replit/codemirror-vim'
 import { oneDark } from '@codemirror/theme-one-dark'
 import { python } from '@codemirror/lang-python'
 import { useTheme } from '@/context/ThemeContext'
 import { usePreferences, EDITOR_HEIGHT_MAP } from '@/context/PreferencesContext'
+import type { ExerciseGoal } from '@/data/curriculum'
+
+export type { ExerciseGoal }
+
+export type ExerciseResult =
+  | { type: 'navigation'; stars: 1 | 2 | 3 }
+  | { type: 'mode' | 'manual' }
+
+// Module-scope so handleReset can reference it outside useEffect
+const setTargetEffect = StateEffect.define<number>()  // char offset; -1 = hide
+
+function isSubsequence(seq: string[], hist: string[]): boolean {
+  let si = 0
+  for (let hi = 0; hi < hist.length && si < seq.length; hi++) {
+    if (hist[hi] === seq[si]) si++
+  }
+  return si === seq.length
+}
+
+function computeNavStars(
+  actualKeystrokes: number,
+  idealKeystrokes: number,
+  totalMs: number,
+  hintUsed: boolean,
+  resetUsed: boolean,
+): 1 | 2 | 3 {
+  if (actualKeystrokes === 0) return 1
+  const keystrokeEff = Math.min(1, idealKeystrokes / actualKeystrokes)
+  const idealMs = idealKeystrokes * 700
+  const timeEff = Math.min(1, idealMs / Math.max(totalMs, 1))
+  const score = keystrokeEff * 0.5 + timeEff * 0.5
+  const rawStars: 1 | 2 | 3 = score >= 0.50 ? 3 : score >= 0.30 ? 2 : 1
+  if (hintUsed || resetUsed) return Math.min(rawStars, 2) as 1 | 2
+  return rawStars
+}
 
 type VimEditorProps = {
   initialText: string
   instructions: string
   hint?: string
-  solution?: string
-  onComplete?: () => void
+  goal?: ExerciseGoal
+  onComplete?: (result: ExerciseResult) => void
   onHintUsed?: () => void
   onReset?: () => void
 }
@@ -24,7 +59,7 @@ export default function VimEditor({
   initialText,
   instructions,
   hint,
-  solution,
+  goal,
   onComplete,
   onHintUsed,
   onReset,
@@ -33,9 +68,26 @@ export default function VimEditor({
   const viewRef = useRef<EditorView | null>(null)
   const completedRef = useRef(false)
   const hintUsedRef = useRef(false)
+  const resetUsedRef = useRef(false)
+  const modeHistoryRef = useRef<string[]>([])
+
+  // Navigation (cursor-reach) refs
+  const currentTargetIdxRef = useRef(0)
+  const segmentKeystrokesRef = useRef(0)
+  const totalActualRef = useRef(0)
+  const totalIdealRef = useRef(0)
+  const segmentStartRef = useRef(Date.now())
+  const totalTimeRef = useRef(0)
+
+  // Mode reps ref
+  const modeRepsRef = useRef(0)
+
   const [showHint, setShowHint] = useState(false)
   const [mode, setMode] = useState('NAV')
   const [completed, setCompleted] = useState(false)
+  const [targetsHit, setTargetsHit] = useState(0)
+  const [modeRepsDisplay, setModeRepsDisplay] = useState(0)
+
   const { theme } = useTheme()
   const { editorHeight, fontSize, lineNumbers: showLineNumbers } = usePreferences()
 
@@ -79,24 +131,142 @@ export default function VimEditor({
   useEffect(() => {
     if (!containerRef.current) return
 
+    // Reset all tracking state on remount
     completedRef.current = false
+    hintUsedRef.current = false
+    resetUsedRef.current = false
+    modeHistoryRef.current = []
+    currentTargetIdxRef.current = 0
+    segmentKeystrokesRef.current = 0
+    totalActualRef.current = 0
+    totalIdealRef.current = 0
+    totalTimeRef.current = 0
+    segmentStartRef.current = Date.now()
+    modeRepsRef.current = 0
+
+    // Target highlight decoration for cursor-reach goals
+    const targetDecoration = (() => {
+      if (goal?.type !== 'cursor-reach' || !goal.targets.length) return []
+
+      const targetHighlight = EditorView.baseTheme({
+        '.cm-goal-target': {
+          outline: '2px solid #f59e0b',
+          borderRadius: '2px',
+          backgroundColor: 'rgba(245, 158, 11, 0.25)',
+        },
+      })
+
+      const targetField = StateField.define<DecorationSet>({
+        create(state) {
+          try {
+            const first = goal.targets[0].target
+            const line = state.doc.line(first[0] + 1)
+            const pos = line.from + first[1]
+            if (pos < state.doc.length) {
+              return RangeSet.of([Decoration.mark({ class: 'cm-goal-target' }).range(pos, pos + 1)])
+            }
+          } catch {}
+          return Decoration.none
+        },
+        update(deco, tr) {
+          for (const e of tr.effects) {
+            if (e.is(setTargetEffect)) {
+              if (e.value < 0) return Decoration.none
+              if (e.value < tr.newDoc.length) {
+                return RangeSet.of([Decoration.mark({ class: 'cm-goal-target' }).range(e.value, e.value + 1)])
+              }
+              return Decoration.none
+            }
+          }
+          return deco
+        },
+        provide: f => EditorView.decorations.from(f),
+      })
+
+      return [targetHighlight, targetField]
+    })()
+
+    // Keystroke counter for navigation scoring
+    const keystrokeTracker = EditorView.domEventHandlers({
+      keydown: (event) => {
+        if (!['Shift', 'Control', 'Alt', 'Meta'].includes(event.key)) {
+          if (goal?.type === 'cursor-reach' && !completedRef.current) {
+            segmentKeystrokesRef.current++
+          }
+        }
+        return false
+      },
+    })
 
     const modeDisplay = EditorView.updateListener.of((update) => {
       const cm = getCM(update.view)
       if (cm) {
         const vimState = cm.state.vim
         if (vimState) {
-          const m = vimState.insertMode ? 'EDIT' : vimState.visualMode ? 'SELECT' : 'NAV'
-          setMode(m)
+          const m = vimState.insertMode ? 'INSERT' : vimState.visualMode ? 'VISUAL' : 'NORMAL'
+          const label = m === 'INSERT' ? 'EDIT' : m === 'VISUAL' ? 'SELECT' : 'NAV'
+          setMode(label)
+
+          if (goal?.type === 'mode-sequence' && !completedRef.current) {
+            const hist = modeHistoryRef.current
+            if (hist[hist.length - 1] !== m) hist.push(m)
+            if (isSubsequence(goal.sequence, hist)) {
+              modeRepsRef.current++
+              setModeRepsDisplay(modeRepsRef.current)
+              modeHistoryRef.current = []  // reset for next rep
+              if (modeRepsRef.current >= goal.reps) {
+                completedRef.current = true
+                setCompleted(true)
+                onComplete?.({ type: 'mode' })
+              }
+            }
+          }
         }
       }
 
-      if (solution && !completedRef.current) {
-        const doc = update.view.state.doc.toString().trimEnd()
-        if (doc === solution.trimEnd()) {
-          completedRef.current = true
-          setCompleted(true)
-          onComplete?.()
+      if (goal?.type === 'cursor-reach' && !completedRef.current) {
+        const idx = currentTargetIdxRef.current
+        if (idx >= goal.targets.length) return
+
+        const currentTarget = goal.targets[idx]
+        const pos = update.view.state.selection.main.head
+        const line = update.view.state.doc.lineAt(pos)
+        const curLine = line.number - 1
+        const curCol = pos - line.from
+
+        if (curLine === currentTarget.target[0] && curCol === currentTarget.target[1]) {
+          const segmentMs = Date.now() - segmentStartRef.current
+          totalActualRef.current += segmentKeystrokesRef.current
+          totalIdealRef.current += currentTarget.idealKeystrokes
+          totalTimeRef.current += segmentMs
+
+          const nextIdx = idx + 1
+
+          if (nextIdx >= goal.targets.length) {
+            completedRef.current = true
+            const stars = computeNavStars(
+              totalActualRef.current,
+              totalIdealRef.current,
+              totalTimeRef.current,
+              hintUsedRef.current,
+              resetUsedRef.current,
+            )
+            setCompleted(true)
+            setTargetsHit(nextIdx)
+            onComplete?.({ type: 'navigation', stars })
+          } else {
+            currentTargetIdxRef.current = nextIdx
+            segmentKeystrokesRef.current = 0
+            segmentStartRef.current = Date.now()
+            setTargetsHit(nextIdx)
+
+            const nextTarget = goal.targets[nextIdx].target
+            try {
+              const nextLine = update.view.state.doc.line(nextTarget[0] + 1)
+              const nextPos = nextLine.from + nextTarget[1]
+              update.view.dispatch({ effects: [setTargetEffect.of(nextPos)] })
+            } catch {}
+          }
         }
       }
     })
@@ -104,11 +274,7 @@ export default function VimEditor({
     const isDark = theme === 'dark'
 
     const lightTheme = EditorView.theme({
-      '&': {
-        fontSize: `${fontSize}px`,
-        fontFamily: 'var(--font-mono), "JetBrains Mono", monospace',
-        backgroundColor: '#ffffff',
-      },
+      '&': { fontSize: `${fontSize}px`, fontFamily: 'var(--font-mono), "JetBrains Mono", monospace', backgroundColor: '#ffffff' },
       '.cm-content': { padding: '16px 0' },
       '.cm-line': { padding: '0 16px', lineHeight: '1.7', color: '#1a1e2e' },
       '.cm-gutters': { backgroundColor: '#f0f2f8', borderRight: '1px solid #cdd4ea', color: '#a8b2d0' },
@@ -120,11 +286,7 @@ export default function VimEditor({
     })
 
     const darkTheme = EditorView.theme({
-      '&': {
-        fontSize: `${fontSize}px`,
-        fontFamily: 'var(--font-mono), "JetBrains Mono", monospace',
-        backgroundColor: '#1a1e2e',
-      },
+      '&': { fontSize: `${fontSize}px`, fontFamily: 'var(--font-mono), "JetBrains Mono", monospace', backgroundColor: '#1a1e2e' },
       '.cm-content': { padding: '16px 0' },
       '.cm-line': { padding: '0 16px', lineHeight: '1.7' },
       '.cm-gutters': { backgroundColor: '#161a28', borderRight: '1px solid #2e3450' },
@@ -150,15 +312,13 @@ export default function VimEditor({
         ...(isDark ? [oneDark, darkTheme] : [lightTheme]),
         keymap.of([...defaultKeymap, ...historyKeymap]),
         modeDisplay,
+        keystrokeTracker,
         blockMouse,
+        ...targetDecoration,
       ],
     })
 
-    const view = new EditorView({
-      state,
-      parent: containerRef.current,
-    })
-
+    const view = new EditorView({ state, parent: containerRef.current })
     viewRef.current = view
     view.focus()
 
@@ -166,19 +326,42 @@ export default function VimEditor({
       view.destroy()
       viewRef.current = null
     }
-  }, [initialText, theme, fontSize, showLineNumbers, solution, onComplete])
+  }, [initialText, theme, fontSize, showLineNumbers, goal, onComplete])
 
   function handleReset() {
     if (!viewRef.current) return
     viewRef.current.dispatch({
-      changes: {
-        from: 0,
-        to: viewRef.current.state.doc.length,
-        insert: initialText,
-      },
+      changes: { from: 0, to: viewRef.current.state.doc.length, insert: initialText },
     })
     viewRef.current.focus()
+
+    completedRef.current = false
+    setCompleted(false)
+    modeHistoryRef.current = []
+    resetUsedRef.current = true
     onReset?.()
+
+    if (goal?.type === 'cursor-reach' && goal.targets.length > 0) {
+      currentTargetIdxRef.current = 0
+      segmentKeystrokesRef.current = 0
+      totalActualRef.current = 0
+      totalIdealRef.current = 0
+      totalTimeRef.current = 0
+      segmentStartRef.current = Date.now()
+      setTargetsHit(0)
+      try {
+        const state = viewRef.current.state
+        const first = goal.targets[0].target
+        const line = state.doc.line(first[0] + 1)
+        const pos = line.from + first[1]
+        viewRef.current.dispatch({ effects: [setTargetEffect.of(pos)] })
+      } catch {}
+    }
+
+    if (goal?.type === 'mode-sequence') {
+      modeRepsRef.current = 0
+      setModeRepsDisplay(0)
+    }
   }
 
   function handleShowHint() {
@@ -193,9 +376,13 @@ export default function VimEditor({
     if (!completedRef.current) {
       completedRef.current = true
       setCompleted(true)
-      onComplete?.()
+      onComplete?.({ type: 'manual' })
     }
   }
+
+  const isManual = !goal || goal.type === 'manual'
+  const totalTargets = goal?.type === 'cursor-reach' ? goal.targets.length : 0
+  const totalReps = goal?.type === 'mode-sequence' ? goal.reps : 0
 
   return (
     <div className="rounded-lg overflow-hidden border border-[var(--border)]">
@@ -232,30 +419,40 @@ export default function VimEditor({
           >
             {mode}
           </span>
+          {!completed && goal?.type === 'cursor-reach' && (
+            <span className="font-mono text-xs text-[var(--text-secondary)]">
+              → {targetsHit} / {totalTargets}
+            </span>
+          )}
+          {!completed && goal?.type === 'mode-sequence' && (
+            <span className="font-mono text-xs text-[var(--text-secondary)]">
+              → {modeRepsDisplay} / {totalReps}
+            </span>
+          )}
           {completed && (
             <span className="font-mono text-xs text-yellow-400 font-semibold">✓ complete</span>
           )}
         </div>
-        <div className="flex gap-3">
+        <div className="flex gap-2">
           {hint && (
             <button
               onClick={handleShowHint}
-              className="font-mono text-xs text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors"
+              className="font-mono text-xs px-2 py-1 rounded border border-[var(--border)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:border-[var(--text-secondary)] transition-colors"
             >
-              {showHint ? 'hide hint' : 'show hint'}
+              {showHint ? 'hide hint' : 'hint'}
             </button>
           )}
-          {!solution && !completed && (
+          {isManual && !completed && (
             <button
               onClick={handleMarkComplete}
-              className="font-mono text-xs text-[var(--text-secondary)] hover:text-[var(--accent)] transition-colors"
+              className="font-mono text-xs px-2 py-1 rounded border border-[var(--border)] text-[var(--accent)] hover:bg-[var(--accent)] hover:text-[var(--accent-text)] transition-colors"
             >
               mark done
             </button>
           )}
           <button
             onClick={handleReset}
-            className="font-mono text-xs text-[var(--text-secondary)] hover:text-[var(--accent)] transition-colors"
+            className="font-mono text-xs px-2 py-1 rounded border border-[var(--border)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:border-[var(--text-secondary)] transition-colors"
           >
             reset
           </button>

@@ -4,7 +4,7 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { Lesson, Section } from '@/data/curriculum'
 import KeyBadge from './KeyBadge'
-import VimEditor from './VimEditor'
+import VimEditor, { type ExerciseResult } from './VimEditor'
 import DemoPlayer from './DemoPlayer'
 import { useProgress } from '@/context/ProgressContext'
 
@@ -48,8 +48,16 @@ export default function LessonContent({ section, lesson, prev, next }: Props) {
 
   const stars = getStars(section.id, lesson.id)
 
-  function handleComplete() {
-    recordCompletion(section.id, lesson.id, hintsUsed, resetsUsed)
+  function handleComplete(result: ExerciseResult) {
+    let stars: 1 | 2 | 3
+    if (result.type === 'navigation') {
+      stars = result.stars
+    } else {
+      if (hintsUsed) stars = 1
+      else if (resetsUsed) stars = 2
+      else stars = 3
+    }
+    recordCompletion(section.id, lesson.id, stars)
   }
 
   return (
@@ -94,7 +102,7 @@ export default function LessonContent({ section, lesson, prev, next }: Props) {
           initialText={lesson.exercise.initialText}
           instructions={lesson.exercise.instructions}
           hint={lesson.exercise.hint}
-          solution={lesson.exercise.solution}
+          goal={lesson.exercise.goal}
           onComplete={handleComplete}
           onHintUsed={() => setHintsUsed(true)}
           onReset={() => setResetsUsed(true)}
