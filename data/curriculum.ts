@@ -144,7 +144,7 @@ active = True`,
         title: 'Moving by Words',
         keys: ['w', 'e', 'b'],
         description:
-          '**w**, **e**, and **b** move you through text word by word.\n\n**w** jumps to the start of the next word.\n**e** jumps to the end of the current word.\n**b** jumps back one word.\nMuch faster than holding l to crawl through a line.',
+          '**w**, **e**, and **b** move you through text word by word.\n\n**w** jumps to the start of the next word.\n**e** jumps to the end of the current word (…or the end of the next word if you\'re already at one).\n**b** jumps back one word.\nMuch faster than holding l to crawl through a line.',
         demo: [
           { mode: 'NORMAL', text: 'greeting = "Hello, World!"', cursor: [0, 0], description: 'Cursor on g of greeting.' },
           { key: 'w', mode: 'NORMAL', text: 'greeting = "Hello, World!"', cursor: [0, 9], description: 'w jumps to next word (=).' },
@@ -178,9 +178,9 @@ message = greeting + str(count)`,
           '**i** and **a** both enter Insert mode, just from different positions.\n\n**i** inserts before the cursor.\n**a** inserts after the cursor.\n**Esc** always returns you to Normal mode.\nMost vim work follows the same loop: navigate in Normal, edit in Insert, Esc back.',
         demo: [
           { mode: 'NORMAL', text: 'name = ""\nrole = ""', cursor: [0, 7], description: 'Cursor inside the empty string.' },
-          { key: 'i', mode: 'INSERT', text: 'name = ""\nrole = ""', cursor: [0, 7], description: 'i enters EDIT before cursor.' },
+          { key: 'i', mode: 'INSERT', text: 'name = ""\nrole = ""', cursor: [0, 7], description: 'i enters Insert mode before the cursor.' },
           { key: 'type', mode: 'INSERT', text: 'name = "Alice"\nrole = ""', cursor: [0, 12], description: 'Type the value.' },
-          { key: 'Esc', mode: 'NORMAL', text: 'name = "Alice"\nrole = ""', cursor: [0, 11], description: 'Esc returns to NAV.' },
+          { key: 'Esc', mode: 'NORMAL', text: 'name = "Alice"\nrole = ""', cursor: [0, 11], description: 'Esc returns to Normal mode.' },
         ],
         exercise: {
           initialText: `print("Hello, !")
@@ -308,7 +308,7 @@ response = requests.get(url).json()`,
           initialText: `    x = 10
     y = 20
     z = x + y`,
-          instructions: 'On line 1, press $ to go to the end, then 0 to go to column 0, then _ to go to "const".',
+          instructions: 'On line 1, press $ to go to the end, then 0 to go to column 0, then _ to jump back to x (the first non-blank character).',
           hint: '$ = end of line, 0 = column 0, _ = first non-blank char',
           goal: { type: 'cursor-reach', targets: [
             { target: [0, 9], idealKeystrokes: 1 },
@@ -411,7 +411,7 @@ yank this line`,
         title: 'Delete Words',
         keys: ['d', 'w'],
         description:
-          '**dw** and friends delete by motion.\n\n**dw** deletes from the cursor to the start of the next word.\n**de** deletes to the end of the current word.\n**dW** deletes the whole WORD.\nPrefix with a count: **3dw** deletes 3 words at once.',
+          '**dw** and friends delete by motion.\n\n**dw** deletes from the cursor to the start of the next word.\n**de** deletes to the end of the current word.\n**dW** deletes the whole WORD.\nPrefix with a count: **3dw** deletes 3 words at once.\n\nTip: **dw** from mid-word only deletes to the end of that word — use **diw** when you want the whole word no matter where the cursor sits.',
         demo: [
           { mode: 'NORMAL', text: 'name = extra_value\nage = 30', cursor: [0, 7], description: 'Cursor on extra_value.' },
           { key: 'dw', mode: 'NORMAL', text: 'name = value\nage = 30', cursor: [0, 7], description: 'dw deletes to start of next word.' },
@@ -430,7 +430,7 @@ Also delete these three unnecessary filler words here.`,
         title: 'Change Words',
         keys: ['c', 'w'],
         description:
-          '**cw** is like **dw** but drops you into Insert mode after.\n\n**cw** deletes the word and enters Insert mode so you can type a replacement.\n**ce** changes to the end of the word.\n**cW** changes the whole WORD.',
+          '**cw** is like **dw** but drops you into Insert mode after.\n\n**cw** deletes the word and enters Insert mode so you can type a replacement.\n**ce** changes to the end of the word.\n**cW** changes the whole WORD.\n\nQuirk: **cw** behaves like **ce** — it stops at the end of the word, not at the start of the next one, so it doesn\'t eat the trailing space.',
         demo: [
           { mode: 'NORMAL', text: 'foo = "bar"\nbaz = 100', cursor: [0, 0], description: 'Cursor on foo.' },
           { key: 'cw', mode: 'INSERT', text: ' = "bar"\nbaz = 100', cursor: [0, 0], description: 'cw deletes word, enters EDIT.' },
@@ -493,7 +493,7 @@ total = x + w  # keep`,
         title: 'Copy/Paste Lines',
         keys: ['y', 'p', 'P'],
         description:
-          '**yy** copies the current line. **p** and **P** paste it.\n\n**yy** yanks the full line.\n**p** pastes below the current line.\n**P** pastes above.\n**yw** yanks just a word.',
+          '**yy** copies the current line. **p** and **P** paste it.\n\n**yy** yanks the full line.\n**p** pastes below the current line.\n**P** pastes above.',
         demo: [
           { mode: 'NORMAL', text: 'PI = 3.14159\n# paste below', cursor: [0, 0], description: 'Cursor on line to copy.' },
           { key: 'yy', mode: 'NORMAL', text: 'PI = 3.14159\n# paste below', cursor: [0, 0], description: 'yy yanks the line into register.' },
@@ -521,7 +521,7 @@ total = x + w  # keep`,
         title: 'Relative Line Jumps',
         keys: ['{n}', 'j', 'k'],
         description:
-          'Prefix j or k with a number to jump multiple lines at once.\n\n**5j** moves down 5 lines, **3k** moves up 3 lines.\nWith relative line numbers on, you can see exactly how far each line is at a glance.',
+          'Prefix j or k with a number to jump multiple lines at once.\n\n**5j** moves down 5 lines, **3k** moves up 3 lines.\nIf your editor shows relative line numbers (a common Vim setting), you can see exactly how far each line is at a glance.',
         demo: [
           { mode: 'NORMAL', text: 'name = "Alice"\nage = 30\ncity = "NYC"\nscore = 95\nactive = True\nlang = "Python"', cursor: [0, 0], description: 'Cursor on line 1.' },
           { key: '4j', mode: 'NORMAL', text: 'name = "Alice"\nage = 30\ncity = "NYC"\nscore = 95\nactive = True\nlang = "Python"', cursor: [4, 0], description: '4j jumps 4 lines down.' },
@@ -700,7 +700,7 @@ return count`,
         title: 'Quick Word Search',
         keys: ['*', '#'],
         description:
-          '**\\*** and **#** search for the word under the cursor without typing anything.\n\n**\\*** searches forward for the current word.\n**#** searches backward.\nJust position your cursor on the word and press.',
+          '**\\*** and **#** search for the word under the cursor without typing anything.\n\n**\\*** searches forward for the current word.\n**#** searches backward.\nJust position your cursor on the word and press.\n\nNote: **\\*** matches whole words only — searching on `user` won\'t find `users`. Use **g\\*** if you want a substring match.',
         exercise: {
           initialText: `user = get_user(id)
 if user:
@@ -879,7 +879,7 @@ print(config)`,
         title: 'Delete Inside Quotes',
         keys: ['d', 'i', '"'],
         description:
-          '**di"** deletes everything inside double quotes.\n\n**di\'** works for single quotes, **di\`** for backticks.\nThe cursor just needs to be anywhere on the same line as the quotes.',
+          '**di"** deletes everything inside double quotes.\n\n**di\'** works for single quotes, **di\`** for backticks.\nThe cursor just needs to be anywhere on the same line as the quotes.\n\nWhen there are multiple quote pairs on the line, vim picks the next pair to the right of (or containing) the cursor.',
         exercise: {
           initialText: `greeting = "Hello, World!"
 name = 'Alice'`,
@@ -982,7 +982,7 @@ author = "Unknown"`,
         title: 'Delete Inside Word',
         keys: ['d', 'i', 'w'],
         description:
-          '**diw** deletes the word under the cursor.\n\nThe surrounding whitespace stays intact.\nYour cursor can be anywhere in the word.',
+          '**diw** deletes the word under the cursor.\n\nThe surrounding whitespace stays intact.\nYour cursor can be anywhere in the word.\n\n**diW** uses the WORD definition from §3 — punctuation is part of the word.',
         exercise: {
           initialText: `Remove the badword from this sentence.
 This has an unwanted word in it.`,
@@ -1076,8 +1076,8 @@ def process():
 
 def teardown():
     cleanup()`,
-          instructions: 'Place cursor anywhere in the second paragraph and press dip to delete it, leaving the blank lines.',
-          hint: 'Move to "Second paragraph", press dip.',
+          instructions: 'Place cursor anywhere inside the process() function block and press dip. Notice the blank lines above and below stay.',
+          hint: 'Move into process(), press dip.',
           goal: { type: 'manual' },
         },
         demo: [
@@ -1129,8 +1129,8 @@ def main():
 
 def finish():
     done()`,
-          instructions: 'Place cursor in the body paragraph and press cip to replace it. Type some new content.',
-          hint: 'Move to "Body paragraph", press cip, type new text, Esc.',
+          instructions: 'Place cursor anywhere inside main() and press cip. Type a replacement body, then Esc.',
+          hint: 'Move into main(), press cip, type new text, Esc.',
           goal: { type: 'manual' },
         },
         demo: [
@@ -1368,7 +1368,7 @@ city = "NYC"`,
         title: 'Undo Line Changes',
         keys: ['U'],
         description:
-          '**U** undoes all changes to the current line at once.\n\nUnlike **u**, it doesn\'t step through one change at a time.\nIt restores the entire line to how it was when you moved to it.',
+          '**U** undoes all changes to the current line at once.\n\nUnlike **u**, it doesn\'t step through one change at a time.\nIt restores the entire line to how it was when you moved to it.\n\nNote: **U** itself counts as a change — pressing **u** right after **U** will undo the line-restore.',
         exercise: {
           initialText: `result = calculate_total(price, tax, discount)`,
           instructions: 'Make a few edits on the line (use r, x, or i). Then press U to undo all changes to that line at once.',
@@ -1393,7 +1393,7 @@ city = "NYC"`,
         title: 'Setting Marks',
         keys: ['m', 'a', "'a"],
         description:
-          '**ma** sets a mark named "a" at the current cursor position.\n\n**\'a** jumps back to the line of that mark.\n**\`a** jumps to the exact cursor position.\nYou can use any letter a–z for local marks.',
+          '**ma** sets a mark named "a" at the current cursor position.\n\n**\'a** jumps back to the line of that mark.\n**\`a** jumps to the exact cursor position.\nYou can use any letter a–z for local marks.\n\nLowercase a–z marks are local to the current file; uppercase A–Z are global and jump across files.',
         exercise: {
           initialText: `# Mark this line as 'a'
 name = "Alice"
@@ -1419,7 +1419,7 @@ city = "NYC"
         title: 'Jump List',
         keys: ['Ctrl+o', 'Ctrl+i'],
         description:
-          'Vim records large jumps in a jump list.\n\n**Ctrl+o** goes back to older positions.\n**Ctrl+i** goes forward.\nAnytime you jump with gg, G, /, or a mark, it gets recorded here.',
+          'Vim records large jumps in a jump list.\n\n**Ctrl+o** goes back to older positions.\n**Ctrl+i** goes forward.\nAnytime you jump with gg, G, /, or a mark, it gets recorded here.\n\n**Ctrl+i** and Tab share a keycode in most terminals — pressing Tab has the same effect as Ctrl+i.',
         exercise: {
           initialText: `# Start here at the top
 import os
