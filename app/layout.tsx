@@ -21,6 +21,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" className={`${geistMono.variable} h-full`} data-theme="dark">
       <body className="h-full flex bg-[var(--bg-base)] antialiased">
+        <a
+          href="#main-content"
+          className="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-50 focus:px-4 focus:py-2 focus:rounded focus:bg-[var(--accent)] focus:text-[var(--accent-text)] focus:font-mono focus:text-sm"
+        >
+          Skip to main content
+        </a>
         <ThemeProvider>
           <PreferencesProvider>
             <AuthSessionProvider>

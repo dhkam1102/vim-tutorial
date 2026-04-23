@@ -1,66 +1,58 @@
 import Link from 'next/link'
 import { curriculum } from '@/data/curriculum'
 import { getFirstLesson } from '@/lib/lessonUtils'
+import ProgressOverview from '@/components/ProgressOverview'
+import HeroTyper from '@/components/HeroTyper'
 
 export default function Home() {
   const first = getFirstLesson()
   const totalLessons = curriculum.reduce((acc, s) => acc + s.lessons.length, 0)
 
   return (
-    <div className="max-w-2xl mx-auto py-16 px-6">
-      <h1 className="font-mono text-4xl font-bold text-[var(--text-primary)] mb-4 tracking-tight">
-        VimTutor
-      </h1>
-      <p className="font-mono text-[var(--text-secondary)] text-lg mb-2 leading-relaxed">
-        Learn vim interactively — practice real commands in your browser.
-      </p>
-      <p className="font-mono text-[var(--text-secondary)] text-sm mb-10">
-        {curriculum.length} sections · {totalLessons} lessons
-      </p>
+    <div className="max-w-4xl mx-auto py-14 px-6 md:px-10">
+      {/* Terminal window chrome */}
+      <div className="border border-[var(--border)] rounded-lg overflow-hidden mb-0">
+        {/* Title bar */}
+        <div className="flex items-center gap-2 px-4 py-2.5 bg-[var(--bg-surface)] border-b border-[var(--border)]">
+          <span className="size-2.5 rounded-full bg-[var(--tn-red)] opacity-70" />
+          <span className="size-2.5 rounded-full bg-[var(--tn-orange)] opacity-70" />
+          <span className="size-2.5 rounded-full bg-[var(--tn-green)] opacity-70" />
+          <span className="flex-1 text-center font-mono text-xs text-[var(--text-secondary)]">vimTutorial</span>
+          <span className="w-[52px]" />
+        </div>
 
-      {first && (
-        <Link
-          href={`/lessons/${first.sectionId}/${first.lessonId}`}
-          className="inline-flex items-center gap-2 bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-[var(--accent-text)] font-mono font-semibold px-6 py-3 rounded-lg transition-colors mb-14"
-        >
-          Start Learning →
-        </Link>
-      )}
+        {/* Terminal content */}
+        <div className="px-6 md:px-10 py-10">
+          {/* Hero */}
+          <header className="mb-12">
+            <p className="section-label mb-3 opacity-70">
+              -- interactive terminal training
+            </p>
+            <HeroTyper />
+            <p className="font-mono text-[var(--text-secondary)] text-sm opacity-60">
+              {curriculum.length} sections&nbsp;&nbsp;·&nbsp;&nbsp;{totalLessons} lessons
+            </p>
+          </header>
 
-      <div className="space-y-6">
-        {curriculum.map((section, i) => (
-          <div key={section.id} className="border border-[var(--border)] rounded-lg overflow-hidden">
-            <div className="bg-[var(--bg-surface)] px-4 py-3 flex items-center gap-3">
-              <span className="font-mono text-xs text-[var(--border-subtle)] w-5">{i + 1}</span>
-              <span className="font-mono text-sm font-semibold text-[var(--accent)]">{section.title}</span>
-              <span className="font-mono text-xs text-[var(--border-subtle)] ml-auto">{section.lessons.length} lessons</span>
+          {/* CTA */}
+          {first && (
+            <div className="mb-14">
+              <Link
+                href={`/lessons/${first.sectionId}/${first.lessonId}`}
+                className="inline-flex items-center gap-3 bg-[var(--bg-surface)] hover:bg-[var(--accent)] text-[var(--accent)] hover:text-[var(--accent-text)] font-mono font-bold px-7 py-3 rounded border border-[color-mix(in_srgb,var(--accent)_25%,transparent)] hover:border-[var(--accent)] transition-colors duration-150 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg-base)]"
+              >
+                <span className="tracking-wide">Start Learning</span>
+                <span aria-hidden="true">→</span>
+              </Link>
             </div>
-            <ul>
-              {section.lessons.map((lesson, j) => (
-                <li key={lesson.id} className={j < section.lessons.length - 1 ? 'border-b border-[var(--border)]' : ''}>
-                  <Link
-                    href={`/lessons/${section.id}/${lesson.id}`}
-                    className="flex items-center justify-between gap-2 px-4 py-2.5 hover:bg-[var(--bg-surface)] transition-colors"
-                  >
-                    <span className="font-mono text-sm text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors">
-                      {lesson.title}
-                    </span>
-                    <span className="flex gap-1 shrink-0">
-                      {lesson.keys.slice(0, 3).map((k, ki) => (
-                        <span
-                          key={ki}
-                          className="inline-flex items-center justify-center rounded bg-[var(--bg-active)] border border-[var(--border-subtle)] text-[var(--text-primary)] font-mono text-xs px-1.5 py-0.5 min-w-[1.5rem]"
-                        >
-                          {k}
-                        </span>
-                      ))}
-                    </span>
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-        ))}
+          )}
+
+          {/* Divider */}
+          <hr className="border-t border-[var(--border)] mb-12" />
+
+          {/* Progress overview */}
+          <ProgressOverview />
+        </div>
       </div>
     </div>
   )

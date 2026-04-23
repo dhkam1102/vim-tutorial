@@ -41,6 +41,23 @@ function renderDescription(text: string) {
   ))
 }
 
+function StarRating({ stars }: { stars: 1 | 2 | 3 | null }) {
+  if (stars === null) return null
+  return (
+    <span className="inline-flex gap-0.5" aria-label={`${stars} out of 3 stars`}>
+      {[1, 2, 3].map((i) => (
+        <span
+          key={i}
+          className={`text-xl star-pop ${i <= stars ? 'star-filled' : 'star-empty'}`}
+          style={{ animationDelay: `${(i - 1) * 0.08}s` }}
+        >
+          ★
+        </span>
+      ))}
+    </span>
+  )
+}
+
 export default function LessonContent({ section, lesson, prev, next }: Props) {
   const [hintsUsed, setHintsUsed] = useState(false)
   const [resetsUsed, setResetsUsed] = useState(false)
@@ -49,34 +66,32 @@ export default function LessonContent({ section, lesson, prev, next }: Props) {
   const stars = getStars(section.id, lesson.id)
 
   function handleComplete(result: ExerciseResult) {
-    let stars: 1 | 2 | 3
-    if (result.type === 'navigation') {
-      stars = result.stars
+    let earned: 1 | 2 | 3
+    if (result.type === 'manual') {
+      if (hintsUsed) earned = 1
+      else if (resetsUsed) earned = 2
+      else earned = 3
     } else {
-      if (hintsUsed) stars = 1
-      else if (resetsUsed) stars = 2
-      else stars = 3
+      earned = result.stars
     }
-    recordCompletion(section.id, lesson.id, stars)
+    recordCompletion(section.id, lesson.id, earned)
   }
 
   return (
-    <div className="max-w-4xl mx-auto py-12 px-10">
-      {/* Section label */}
-      <p className="font-mono text-sm uppercase tracking-widest text-[var(--accent)] mb-3">
+    <article className="max-w-3xl mx-auto py-10 px-6 md:px-10">
+      {/* Breadcrumb label */}
+      <p className="section-label mb-3" aria-label={`Section: ${section.title}`}>
         {section.title}
       </p>
 
-      {/* Title + keys */}
+      {/* Title row */}
       <div className="flex items-start justify-between gap-4 mb-8">
-        <h1 className="font-mono text-3xl font-bold text-[var(--text-primary)]">{lesson.title}</h1>
+        <h1 className="font-mono text-3xl font-bold text-[var(--text-primary)] leading-tight">
+          {lesson.title}
+        </h1>
         <div className="flex items-center gap-3 shrink-0 pt-1">
-          {stars !== null && (
-            <span className="font-mono text-lg text-yellow-400">
-              {'★'.repeat(stars)}{'☆'.repeat(3 - stars)}
-            </span>
-          )}
-          <div className="flex gap-2">
+          {stars !== null && <StarRating stars={stars} />}
+          <div className="flex gap-1.5">
             {lesson.keys.map((k, i) => (
               <KeyBadge key={i} keyName={k} large />
             ))}
@@ -85,23 +100,21 @@ export default function LessonContent({ section, lesson, prev, next }: Props) {
       </div>
 
       {/* Description */}
-      <div className="font-mono text-base text-[var(--text-secondary)] leading-loose mb-10 p-6 bg-[var(--bg-surface)] rounded-lg border border-[var(--border)]">
+      <div className="font-mono text-sm text-[var(--text-secondary)] leading-[1.9] mb-10 p-5 bg-[var(--bg-surface)] rounded border border-[var(--border)]">
         {renderDescription(lesson.description)}
       </div>
 
       {/* Demo walkthrough */}
       {lesson.demo && <DemoPlayer steps={lesson.demo} />}
 
-      {/* Interactive editor */}
-      <div className="mb-12">
-        <h2 className="font-mono text-sm font-semibold text-[var(--accent)] uppercase tracking-widest mb-4">
-          Practice
-        </h2>
+      {/* Practice editor */}
+      <div className="mb-10">
         <VimEditor
           key={section.id + lesson.id}
           initialText={lesson.exercise.initialText}
           instructions={lesson.exercise.instructions}
           hint={lesson.exercise.hint}
+          hints={lesson.exercise.hints}
           goal={lesson.exercise.goal}
           onComplete={handleComplete}
           onHintUsed={() => setHintsUsed(true)}
@@ -110,13 +123,17 @@ export default function LessonContent({ section, lesson, prev, next }: Props) {
       </div>
 
       {/* Prev / Next nav */}
-      <div className="flex justify-between gap-4 border-t border-[var(--border)] pt-6">
+      <nav
+        aria-label="Lesson navigation"
+        className="flex justify-between gap-4 border-t border-[var(--border)] pt-6 mt-4"
+      >
         {prev ? (
           <Link
             href={`/lessons/${prev.sectionId}/${prev.lessonId}`}
-            className="font-mono text-sm text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors flex items-center gap-1"
+            className="font-mono text-sm text-[var(--text-secondary)] hover:text-[var(--accent)] transition-colors flex items-center gap-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] rounded"
           >
-            ← {prev.title}
+            <span aria-hidden="true">←</span>
+            <span className="truncate max-w-[200px]">{prev.title}</span>
           </Link>
         ) : (
           <div />
@@ -124,14 +141,15 @@ export default function LessonContent({ section, lesson, prev, next }: Props) {
         {next ? (
           <Link
             href={`/lessons/${next.sectionId}/${next.lessonId}`}
-            className="font-mono text-sm text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors flex items-center gap-1"
+            className="font-mono text-sm text-[var(--text-secondary)] hover:text-[var(--accent)] transition-colors flex items-center gap-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] rounded"
           >
-            {next.title} →
+            <span className="truncate max-w-[200px]">{next.title}</span>
+            <span aria-hidden="true">→</span>
           </Link>
         ) : (
           <div />
         )}
-      </div>
-    </div>
+      </nav>
+    </article>
   )
 }

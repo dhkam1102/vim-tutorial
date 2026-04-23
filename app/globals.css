@@ -1,49 +1,219 @@
+/* JetBrains Mono (code) + IBM Plex Mono (display weights) */
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+
 @import "tailwindcss";
 
+/* ─── Tokyo Night ────────────────────────────────────────────────────── */
 :root,
 [data-theme="dark"] {
-  --bg-base: #161a28;
-  --bg-sidebar: #1a1e2e;
-  --bg-surface: #1e2436;
-  --bg-hover: #252a3a;
-  --bg-active: #2e3450;
-  --border: #2e3450;
-  --border-subtle: #4a5180;
-  --text-primary: #ffffff;
-  --text-secondary: #9aa0c0;
-  --text-muted: #c8cce8;
-  --accent: #4ec9b0;
-  --accent-hover: #3ab89f;
-  --accent-text: #161a28;
-  --badge-bg: #3a4060;
-  --font-mono: "Geist Mono", monospace;
+  --bg-base:        #1a1b26;
+  --bg-sidebar:     #16161e;
+  --bg-surface:     #24283b;
+  --bg-hover:       #292e42;
+  --bg-active:      #33394d;
+  --border:         #292e42;
+  --border-subtle:  #3b4261;
+  --text-primary:   #c0caf5;
+  --text-secondary: #565f89;
+  --text-muted:     #a9b1d6;
+  --accent:         #7aa2f7;
+  --accent-dim:     #3d59a1;
+  --accent-hover:   #89b4fa;
+  --accent-text:    #1a1b26;
+  --accent-glow:    rgba(122, 162, 247, 0.12);
+  --star-color:     #e0af68;
+  --star-glow:      rgba(224, 175, 104, 0.12);
+  --badge-bg:       #24283b;
+  --font-mono:      "JetBrains Mono", "IBM Plex Mono", monospace;
+  --font-display:   "IBM Plex Mono", monospace;
+
+  --keycap-bg:      #24283b;
+  --keycap-top:     #292e42;
+  --keycap-shadow:  #13141f;
+  --keycap-border:  #3b4261;
+  --keycap-text:    #a9b1d6;
+
+  --target-highlight:      #bb9af7;
+  --target-highlight-glow: rgba(187, 154, 247, 0.16);
+  --target-highlight-bg:   rgba(187, 154, 247, 0.07);
+
+  --tn-cyan:        #7dcfff;
+  --tn-green:       #9ece6a;
+  --tn-red:         #f7768e;
+  --tn-orange:      #ff9e64;
+  --tn-purple:      #bb9af7;
 }
 
 [data-theme="light"] {
-  --bg-base: #f0f2f8;
-  --bg-sidebar: #e4e8f5;
-  --bg-surface: #ffffff;
-  --bg-hover: #dde2f0;
-  --bg-active: #cdd4ea;
-  --border: #cdd4ea;
-  --border-subtle: #a8b2d0;
-  --text-primary: #1a1e2e;
-  --text-secondary: #4a5270;
-  --text-muted: #3a4060;
-  --accent: #0d9b84;
-  --accent-hover: #0b8a75;
-  --accent-text: #ffffff;
-  --badge-bg: #d4d9ee;
-  --font-mono: "Geist Mono", monospace;
+  --bg-base:        #f8fafc;
+  --bg-sidebar:     #f1f5fb;
+  --bg-surface:     #ffffff;
+  --bg-hover:       #e8eef8;
+  --bg-active:      #dce5f5;
+  --border:         #cbd5e8;
+  --border-subtle:  #b0bdd4;
+  --text-primary:   #0f1729;
+  --text-secondary: #4b5680;
+  --text-muted:     #6b749a;
+  --accent:         #2563eb;
+  --accent-dim:     #1d4ed8;
+  --accent-hover:   #3b82f6;
+  --accent-text:    #ffffff;
+  --accent-glow:    rgba(37, 99, 235, 0.10);
+  --star-color:     #d97706;
+  --star-glow:      rgba(217, 119, 6, 0.10);
+  --badge-bg:       #e2eaf8;
+  --font-mono:      "JetBrains Mono", "IBM Plex Mono", monospace;
+  --font-display:   "IBM Plex Mono", monospace;
+
+  --keycap-bg:      #dce5f5;
+  --keycap-top:     #e8eef8;
+  --keycap-shadow:  #b8c5dc;
+  --keycap-border:  #bfcde0;
+  --keycap-text:    #0f1729;
+
+  --target-highlight:      #7c3aed;
+  --target-highlight-glow: rgba(124, 58, 237, 0.10);
+  --target-highlight-bg:   rgba(124, 58, 237, 0.05);
 }
 
+/* ─── Base ──────────────────────────────────────────────────────────── */
 body {
   background: var(--bg-base);
   color: var(--text-secondary);
-  transition: background 0.15s, color 0.15s;
+  font-family: var(--font-mono);
+  font-feature-settings: "liga" 1, "calt" 1;
+  background-image: radial-gradient(circle, var(--border-subtle) 0.5px, transparent 0.5px);
+  background-size: 24px 24px;
+  background-attachment: fixed;
 }
 
-/* CodeMirror scrollbar styling */
+/* ─── Keycap badge ──────────────────────────────────────────────────── */
+.keycap {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-mono);
+  font-weight: 500;
+  background: var(--keycap-top);
+  color: var(--keycap-text);
+  border: 1px solid var(--keycap-border);
+  border-radius: 5px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  transition: transform 0.08s ease, box-shadow 0.08s ease;
+  user-select: none;
+}
+.keycap:active {
+  transform: translateY(1px);
+  box-shadow: 0 0 1px rgba(0, 0, 0, 0.3);
+}
+
+/* ─── Sidebar active item ───────────────────────────────────────────── */
+.lesson-active {
+  background: var(--bg-active);
+  border-left: 2px solid var(--accent);
+  color: var(--text-primary);
+}
+
+/* ─── Prompt glyph ──────────────────────────────────────────────────── */
+.prompt-glyph::before {
+  content: '$ ';
+  color: var(--accent);
+  opacity: 0.45;
+}
+
+/* ─── Accent link ───────────────────────────────────────────────────── */
+.accent-link {
+  color: var(--accent);
+  text-decoration: none;
+  transition: color 0.15s;
+}
+.accent-link:hover {
+  color: var(--accent-hover);
+}
+
+/* ─── Progress track ────────────────────────────────────────────────── */
+.progress-track {
+  height: 3px;
+  background: var(--border);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.progress-fill {
+  height: 100%;
+  width: 100%;
+  background: var(--accent);
+  border-radius: 2px;
+  transform-origin: left;
+  transform: scaleX(var(--fill-pct, 0));
+  transition: transform 0.5s ease-out;
+}
+.progress-fill-complete {
+  background: var(--tn-green);
+}
+
+/* ─── Star rating ───────────────────────────────────────────────────── */
+.star-filled {
+  color: var(--star-color);
+}
+.star-empty {
+  color: var(--border-subtle);
+}
+
+/* ─── Section header label ──────────────────────────────────────────── */
+.section-label {
+  font-size: 0.6875rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+/* ─── Section fade-in (replaces phosphor flicker) ─────────────────── */
+@keyframes fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+.phosphor-in {
+  animation: fade-in 0.25s ease-out both;
+}
+
+/* ─── Staggered fade-up for lesson items ────────────────────────────── */
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.fade-up {
+  animation: fade-up 0.2s ease-out both;
+}
+
+/* ─── Star pop ──────────────────────────────────────────────────────── */
+@keyframes star-pop {
+  0%   { transform: scale(0.6); opacity: 0; }
+  60%  { transform: scale(1.15); }
+  100% { transform: scale(1); opacity: 1; }
+}
+.star-pop {
+  animation: star-pop 0.2s ease-out both;
+}
+
+/* ─── Cursor blink ──────────────────────────────────────────────────── */
+@keyframes cursor-blink {
+  0%, 49% { opacity: 1; }
+  50%, 100% { opacity: 0; }
+}
+.crt-cursor::after {
+  content: '\2588';
+  color: var(--accent);
+  animation: cursor-blink 1s step-end infinite;
+  margin-left: 1px;
+  font-weight: 400;
+}
+.demo-cursor {
+  animation: cursor-blink 0.8s step-end infinite;
+}
+
+/* ─── CodeMirror scrollbar ──────────────────────────────────────────── */
 .cm-scroller::-webkit-scrollbar {
   width: 6px;
   height: 6px;
@@ -52,6 +222,27 @@ body {
   background: var(--bg-base);
 }
 .cm-scroller::-webkit-scrollbar-thumb {
-  background: var(--bg-active);
+  background: var(--border-subtle);
   border-radius: 3px;
+}
+.cm-scroller::-webkit-scrollbar-thumb:hover {
+  background: var(--accent-dim);
+}
+
+/* ─── Reduced motion ────────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .phosphor-in,
+  .fade-up,
+  .star-pop {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+  .crt-cursor::after,
+  .demo-cursor {
+    animation: none;
+  }
+  .progress-fill {
+    transition: none;
+  }
 }

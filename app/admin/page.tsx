@@ -14,16 +14,17 @@ export default async function AdminPage() {
 
   return (
     <div className="max-w-5xl mx-auto py-12 px-10">
+      <p className="section-label mb-2">Dashboard</p>
       <h1 className="font-mono text-2xl font-bold text-[var(--text-primary)] mb-8">Admin</h1>
       <div className="rounded-lg border border-[var(--border)] overflow-hidden">
         <table className="w-full font-mono text-sm">
           <thead>
             <tr className="bg-[var(--bg-surface)] border-b border-[var(--border)]">
-              <th className="text-left px-4 py-3 text-[var(--text-secondary)] font-semibold">Email</th>
-              <th className="text-left px-4 py-3 text-[var(--text-secondary)] font-semibold">Role</th>
-              <th className="text-left px-4 py-3 text-[var(--text-secondary)] font-semibold">Completed</th>
-              <th className="text-left px-4 py-3 text-[var(--text-secondary)] font-semibold">Total ★</th>
-              <th className="text-left px-4 py-3 text-[var(--text-secondary)] font-semibold">Last active</th>
+              <th className="text-left px-4 py-3"><span className="section-label">Email</span></th>
+              <th className="text-left px-4 py-3"><span className="section-label">Role</span></th>
+              <th className="text-left px-4 py-3"><span className="section-label">Completed</span></th>
+              <th className="text-left px-4 py-3"><span className="section-label">Total <span className="star-filled">★</span></span></th>
+              <th className="text-left px-4 py-3"><span className="section-label">Last active</span></th>
             </tr>
           </thead>
           <tbody>

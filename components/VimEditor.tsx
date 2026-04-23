@@ -15,10 +15,14 @@ export type { ExerciseGoal }
 
 export type ExerciseResult =
   | { type: 'navigation'; stars: 1 | 2 | 3 }
-  | { type: 'mode' | 'manual' }
+  | { type: 'mode'; stars: 1 | 2 | 3 }
+  | { type: 'edit'; stars: 1 | 2 | 3 }
+  | { type: 'multi'; stars: 1 | 2 | 3 }
+  | { type: 'manual' }
 
-// Module-scope so handleReset can reference it outside useEffect
-const setTargetEffect = StateEffect.define<number>()  // char offset; -1 = hide
+const setTargetEffect = StateEffect.define<number>()
+const MS_PER_IDEAL_KEY = 900
+const BLOCKED_NAV_KEYS = new Set(['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'PageUp', 'PageDown', 'Home', 'End'])
 
 function isSubsequence(seq: string[], hist: string[]): boolean {
   let si = 0
@@ -28,37 +32,57 @@ function isSubsequence(seq: string[], hist: string[]): boolean {
   return si === seq.length
 }
 
-function computeNavStars(
+function computeStars(
   actualKeystrokes: number,
   idealKeystrokes: number,
   totalMs: number,
-  hintUsed: boolean,
+  hintTier: number,
   resetUsed: boolean,
 ): 1 | 2 | 3 {
   if (actualKeystrokes === 0) return 1
   const keystrokeEff = Math.min(1, idealKeystrokes / actualKeystrokes)
-  const idealMs = idealKeystrokes * 700
+  const idealMs = idealKeystrokes * MS_PER_IDEAL_KEY
   const timeEff = Math.min(1, idealMs / Math.max(totalMs, 1))
-  const score = keystrokeEff * 0.5 + timeEff * 0.5
-  const rawStars: 1 | 2 | 3 = score >= 0.50 ? 3 : score >= 0.30 ? 2 : 1
-  if (hintUsed || resetUsed) return Math.min(rawStars, 2) as 1 | 2
-  return rawStars
+  const score = keystrokeEff * 0.7 + timeEff * 0.3
+  const rawStars: 1 | 2 | 3 = score >= 0.85 ? 3 : score >= 0.60 ? 2 : 1
+  let capped: 1 | 2 | 3 = rawStars
+  if (resetUsed) capped = Math.min(capped, 2) as 1 | 2
+  if (hintTier >= 3) capped = 1
+  else if (hintTier === 2) capped = Math.min(capped, 2) as 1 | 2
+  // tier 1 = nudge, no cap
+  return capped
 }
 
 type VimEditorProps = {
   initialText: string
   instructions: string
   hint?: string
+  hints?: string[]
   goal?: ExerciseGoal
   onComplete?: (result: ExerciseResult) => void
   onHintUsed?: () => void
   onReset?: () => void
 }
 
+type VimModeLabel = 'NORMAL' | 'INSERT' | 'VISUAL' | 'VISUAL_LINE'
+
+function readVimMode(view: EditorView): VimModeLabel | null {
+  const cm = getCM(view)
+  const vs = cm?.state.vim
+  if (!vs) return null
+  if (vs.insertMode) return 'INSERT'
+  if (vs.visualMode) {
+    const lineWise = (vs as unknown as { visualLine?: boolean }).visualLine
+    return lineWise ? 'VISUAL_LINE' : 'VISUAL'
+  }
+  return 'NORMAL'
+}
+
 export default function VimEditor({
   initialText,
   instructions,
   hint,
+  hints,
   goal,
   onComplete,
   onHintUsed,
@@ -67,11 +91,10 @@ export default function VimEditor({
   const containerRef = useRef<HTMLDivElement>(null)
   const viewRef = useRef<EditorView | null>(null)
   const completedRef = useRef(false)
-  const hintUsedRef = useRef(false)
+  const hintTierRef = useRef(0)
   const resetUsedRef = useRef(false)
   const modeHistoryRef = useRef<string[]>([])
 
-  // Navigation (cursor-reach) refs
   const currentTargetIdxRef = useRef(0)
   const segmentKeystrokesRef = useRef(0)
   const totalActualRef = useRef(0)
@@ -79,14 +102,23 @@ export default function VimEditor({
   const segmentStartRef = useRef(Date.now())
   const totalTimeRef = useRef(0)
 
-  // Mode reps ref
   const modeRepsRef = useRef(0)
+  const totalKeystrokesRef = useRef(0)
+  const startTimeRef = useRef(Date.now())
+
+  const currentStepIdxRef = useRef(0)
+
+  // Tier list — hints[] takes precedence, falls back to single hint
+  const hintTiers: string[] = hints && hints.length ? hints : hint ? [hint] : []
 
   const [showHint, setShowHint] = useState(false)
-  const [mode, setMode] = useState('NAV')
+  const [hintTier, setHintTier] = useState(0)
+  const [modeLabel, setModeLabel] = useState('NAV')
   const [completed, setCompleted] = useState(false)
   const [targetsHit, setTargetsHit] = useState(0)
   const [modeRepsDisplay, setModeRepsDisplay] = useState(0)
+  const [stepIdx, setStepIdx] = useState(0)
+  const [gradeLabel, setGradeLabel] = useState<string | null>(null)
 
   const { theme } = useTheme()
   const { editorHeight, fontSize, lineNumbers: showLineNumbers } = usePreferences()
@@ -131,9 +163,8 @@ export default function VimEditor({
   useEffect(() => {
     if (!containerRef.current) return
 
-    // Reset all tracking state on remount
     completedRef.current = false
-    hintUsedRef.current = false
+    hintTierRef.current = 0
     resetUsedRef.current = false
     modeHistoryRef.current = []
     currentTargetIdxRef.current = 0
@@ -142,9 +173,30 @@ export default function VimEditor({
     totalIdealRef.current = 0
     totalTimeRef.current = 0
     segmentStartRef.current = Date.now()
+    startTimeRef.current = Date.now()
     modeRepsRef.current = 0
+    totalKeystrokesRef.current = 0
+    currentStepIdxRef.current = 0
+    setHintTier(0)
+    setStepIdx(0)
+    setGradeLabel(null)
 
-    // Target highlight decoration for cursor-reach goals
+    const finishEditGoal = (idealKs: number, resultType: 'edit' | 'multi' | 'mode') => {
+      if (completedRef.current) return
+      completedRef.current = true
+      const elapsed = Date.now() - startTimeRef.current
+      const stars = computeStars(
+        totalKeystrokesRef.current,
+        idealKs,
+        elapsed,
+        hintTierRef.current,
+        resetUsedRef.current,
+      )
+      setCompleted(true)
+      setGradeLabel(`${totalKeystrokesRef.current} keys vs ideal ${idealKs}`)
+      onComplete?.({ type: resultType, stars })
+    }
+
     const targetDecoration = (() => {
       if (goal?.type !== 'cursor-reach' || !goal.targets.length) return []
 
@@ -186,38 +238,48 @@ export default function VimEditor({
       return [targetHighlight, targetField]
     })()
 
-    // Keystroke counter for navigation scoring
     const keystrokeTracker = EditorView.domEventHandlers({
       keydown: (event) => {
-        if (!['Shift', 'Control', 'Alt', 'Meta'].includes(event.key)) {
-          if (goal?.type === 'cursor-reach' && !completedRef.current) {
-            segmentKeystrokesRef.current++
+        if (['Shift', 'Control', 'Alt', 'Meta'].includes(event.key)) return false
+
+        if (goal?.type === 'cursor-reach') {
+          if (BLOCKED_NAV_KEYS.has(event.key)) {
+            event.preventDefault()
+            return true
           }
+          const idx = currentTargetIdxRef.current
+          const allowed = goal.targets[idx]?.allowedKeys
+          if (allowed && !allowed.includes(event.key)) {
+            event.preventDefault()
+            return true
+          }
+          if (!completedRef.current) segmentKeystrokesRef.current++
         }
+
+        if (!completedRef.current) totalKeystrokesRef.current++
         return false
       },
     })
 
     const modeDisplay = EditorView.updateListener.of((update) => {
-      const cm = getCM(update.view)
-      if (cm) {
-        const vimState = cm.state.vim
-        if (vimState) {
-          const m = vimState.insertMode ? 'INSERT' : vimState.visualMode ? 'VISUAL' : 'NORMAL'
-          const label = m === 'INSERT' ? 'EDIT' : m === 'VISUAL' ? 'SELECT' : 'NAV'
-          setMode(label)
+      const m = readVimMode(update.view)
+      if (m) {
+        const label = m === 'INSERT' ? 'EDIT' : m === 'VISUAL' || m === 'VISUAL_LINE' ? 'SELECT' : 'NAV'
+        setModeLabel(label)
 
-          if (goal?.type === 'mode-sequence' && !completedRef.current) {
-            const hist = modeHistoryRef.current
-            if (hist[hist.length - 1] !== m) hist.push(m)
-            if (isSubsequence(goal.sequence, hist)) {
+        if (goal?.type === 'mode-sequence' && !completedRef.current) {
+          const hist = modeHistoryRef.current
+          if (hist[hist.length - 1] !== m) hist.push(m)
+          if (isSubsequence(goal.sequence, hist)) {
+            const finalText = update.view.state.doc.toString()
+            const contentOk = !goal.contentCheck || goal.contentCheck(finalText, initialText)
+            modeHistoryRef.current = []
+            if (contentOk) {
               modeRepsRef.current++
               setModeRepsDisplay(modeRepsRef.current)
-              modeHistoryRef.current = []  // reset for next rep
               if (modeRepsRef.current >= goal.reps) {
-                completedRef.current = true
-                setCompleted(true)
-                onComplete?.({ type: 'mode' })
+                const idealKs = goal.idealKeystrokes ?? Math.max(1, goal.reps * goal.sequence.length)
+                finishEditGoal(idealKs, 'mode')
               }
             }
           }
@@ -244,15 +306,16 @@ export default function VimEditor({
 
           if (nextIdx >= goal.targets.length) {
             completedRef.current = true
-            const stars = computeNavStars(
+            const stars = computeStars(
               totalActualRef.current,
               totalIdealRef.current,
               totalTimeRef.current,
-              hintUsedRef.current,
+              hintTierRef.current,
               resetUsedRef.current,
             )
             setCompleted(true)
             setTargetsHit(nextIdx)
+            setGradeLabel(`${totalActualRef.current} keys vs ideal ${totalIdealRef.current}`)
             onComplete?.({ type: 'navigation', stars })
           } else {
             currentTargetIdxRef.current = nextIdx
@@ -266,6 +329,51 @@ export default function VimEditor({
               const nextPos = nextLine.from + nextTarget[1]
               update.view.dispatch({ effects: [setTargetEffect.of(nextPos)] })
             } catch {}
+          }
+        }
+      }
+
+      if (goal?.type === 'text-equals' && !completedRef.current) {
+        const text = update.view.state.doc.toString()
+        if (text === goal.expected) {
+          if (goal.requireNormalOnExit && readVimMode(update.view) !== 'NORMAL') return
+          finishEditGoal(goal.idealKeystrokes, 'edit')
+        }
+      }
+
+      if (goal?.type === 'text-matches' && !completedRef.current) {
+        const text = update.view.state.doc.toString()
+        if (goal.pattern.test(text)) {
+          if (goal.requireNormalOnExit && readVimMode(update.view) !== 'NORMAL') return
+          finishEditGoal(goal.idealKeystrokes, 'edit')
+        }
+      }
+
+      if (goal?.type === 'multi-step' && !completedRef.current) {
+        const idx = currentStepIdxRef.current
+        const step = goal.steps[idx]
+        if (!step) return
+        const text = update.view.state.doc.toString()
+        const mode = readVimMode(update.view)
+        const pos = update.view.state.selection.main.head
+        const line = update.view.state.doc.lineAt(pos)
+        const curLine = line.number - 1
+        const curCol = pos - line.from
+
+        const textOk = step.textEquals != null
+          ? text === step.textEquals
+          : step.textMatches != null ? step.textMatches.test(text) : true
+        const cursorOk = !step.cursor || (curLine === step.cursor[0] && curCol === step.cursor[1])
+        const modeOk = !step.mode || step.mode === mode
+
+        if (textOk && cursorOk && modeOk) {
+          const nextIdx = idx + 1
+          if (nextIdx >= goal.steps.length) {
+            const idealKs = goal.steps.reduce((sum, s) => sum + (s.idealKeystrokes ?? 0), 0) || 1
+            finishEditGoal(idealKs, 'multi')
+          } else {
+            currentStepIdxRef.current = nextIdx
+            setStepIdx(nextIdx)
           }
         }
       }
@@ -297,7 +405,7 @@ export default function VimEditor({
     })
 
     const blockMouse = EditorView.domEventHandlers({
-      mousedown: (e) => { e.preventDefault(); return true },
+      mousedown: (e, view) => { e.preventDefault(); view.focus(); return true },
       contextmenu: (e) => { e.preventDefault(); return true },
     })
 
@@ -337,8 +445,11 @@ export default function VimEditor({
 
     completedRef.current = false
     setCompleted(false)
+    setGradeLabel(null)
     modeHistoryRef.current = []
     resetUsedRef.current = true
+    totalKeystrokesRef.current = 0
+    startTimeRef.current = Date.now()
     onReset?.()
 
     if (goal?.type === 'cursor-reach' && goal.targets.length > 0) {
@@ -362,13 +473,31 @@ export default function VimEditor({
       modeRepsRef.current = 0
       setModeRepsDisplay(0)
     }
+
+    if (goal?.type === 'multi-step') {
+      currentStepIdxRef.current = 0
+      setStepIdx(0)
+    }
   }
 
   function handleShowHint() {
-    setShowHint((v) => !v)
-    if (!hintUsedRef.current) {
-      hintUsedRef.current = true
-      onHintUsed?.()
+    if (!hintTiers.length) return
+    if (!showHint) {
+      setShowHint(true)
+      if (hintTier === 0) {
+        hintTierRef.current = 1
+        setHintTier(1)
+        onHintUsed?.()
+      }
+      return
+    }
+    // already showing — advance tier if possible, else hide
+    if (hintTier < hintTiers.length) {
+      const next = hintTier + 1
+      hintTierRef.current = next
+      setHintTier(next)
+    } else {
+      setShowHint(false)
     }
   }
 
@@ -383,21 +512,39 @@ export default function VimEditor({
   const isManual = !goal || goal.type === 'manual'
   const totalTargets = goal?.type === 'cursor-reach' ? goal.targets.length : 0
   const totalReps = goal?.type === 'mode-sequence' ? goal.reps : 0
+  const totalSteps = goal?.type === 'multi-step' ? goal.steps.length : 0
+  const currentStepLabel = goal?.type === 'multi-step' ? goal.steps[stepIdx]?.label : null
+
+  const hintButtonLabel = (() => {
+    if (!hintTiers.length) return null
+    if (!showHint) return hintTiers.length > 1 ? `hint (1/${hintTiers.length})` : 'hint'
+    if (hintTier < hintTiers.length) return `hint (${hintTier}/${hintTiers.length}) — next`
+    return 'hide hint'
+  })()
+
+  const visibleHint = showHint && hintTier > 0 ? hintTiers[Math.min(hintTier, hintTiers.length) - 1] : null
 
   return (
-    <div className="rounded-lg overflow-hidden border border-[var(--border)]">
-      {/* Instructions bar */}
-      <div className="bg-[var(--bg-surface)] px-4 py-3 border-b border-[var(--border)]">
-        <p className="font-mono text-base text-[var(--text-secondary)]">
+    <div>
+      <div className="mb-3 p-5 bg-[var(--bg-surface)] rounded border border-[var(--border)]">
+        <p className="font-mono text-sm text-[var(--text-secondary)] leading-[1.9]">
           <span className="text-[var(--accent)] font-semibold">Exercise: </span>
           {instructions}
         </p>
       </div>
 
-      {/* Editor */}
+      <div className="rounded-lg overflow-hidden border border-[var(--border)]">
+      {/* Title bar */}
+      <div className="flex items-center gap-2 px-4 py-2.5 bg-[var(--bg-surface)] border-b border-[var(--border)]">
+        <span className="size-2.5 rounded-full bg-[var(--tn-red)] opacity-70" />
+        <span className="size-2.5 rounded-full bg-[var(--tn-orange)] opacity-70" />
+        <span className="size-2.5 rounded-full bg-[var(--tn-green)] opacity-70" />
+        <span className="flex-1 text-center font-mono text-xs text-[var(--text-secondary)]">Practice</span>
+        <span className="w-[52px]" />
+      </div>
+
       <div ref={containerRef} style={{ height: `${height}px`, overflow: 'auto' }} />
 
-      {/* Drag handle */}
       <div
         onMouseDown={onDragMouseDown}
         className="h-2 bg-[var(--bg-base)] border-t border-[var(--border)] cursor-row-resize flex items-center justify-center group"
@@ -405,19 +552,18 @@ export default function VimEditor({
         <div className="w-8 h-0.5 rounded-full bg-[var(--border)] group-hover:bg-[var(--accent)] transition-colors" />
       </div>
 
-      {/* Status bar */}
       <div className="bg-[var(--bg-base)] px-4 py-2 border-t border-[var(--border)] flex items-center justify-between">
         <div className="flex items-center gap-2">
           <span
             className={`font-mono text-xs px-2 py-0.5 rounded font-bold ${
-              mode === 'EDIT'
+              modeLabel === 'EDIT'
                 ? 'bg-[var(--accent)] text-[var(--accent-text)]'
-                : mode === 'SELECT'
+                : modeLabel === 'SELECT'
                 ? 'bg-purple-500 text-white'
                 : 'bg-[var(--bg-active)] text-[var(--text-secondary)]'
             }`}
           >
-            {mode}
+            {modeLabel}
           </span>
           {!completed && goal?.type === 'cursor-reach' && (
             <span className="font-mono text-xs text-[var(--text-secondary)]">
@@ -429,17 +575,25 @@ export default function VimEditor({
               → {modeRepsDisplay} / {totalReps}
             </span>
           )}
+          {!completed && goal?.type === 'multi-step' && (
+            <span className="font-mono text-xs text-[var(--text-secondary)]">
+              → step {stepIdx + 1} / {totalSteps}
+              {currentStepLabel ? ` — ${currentStepLabel}` : ''}
+            </span>
+          )}
           {completed && (
-            <span className="font-mono text-xs text-yellow-400 font-semibold">✓ complete</span>
+            <span className="font-mono text-xs text-yellow-400 font-semibold">
+              ✓ complete{gradeLabel ? ` · ${gradeLabel}` : ''}
+            </span>
           )}
         </div>
         <div className="flex gap-2">
-          {hint && (
+          {hintButtonLabel && (
             <button
               onClick={handleShowHint}
               className="font-mono text-xs px-2 py-1 rounded border border-[var(--border)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:border-[var(--text-secondary)] transition-colors"
             >
-              {showHint ? 'hide hint' : 'hint'}
+              {hintButtonLabel}
             </button>
           )}
           {isManual && !completed && (
@@ -459,15 +613,15 @@ export default function VimEditor({
         </div>
       </div>
 
-      {/* Hint */}
-      {showHint && hint && (
+      {visibleHint && (
         <div className="bg-[var(--bg-surface)] border-t border-[var(--border)] px-4 py-2">
           <p className="font-mono text-xs text-[var(--text-secondary)]">
-            <span className="text-yellow-500">Hint: </span>
-            {hint}
+            <span className="text-yellow-500">Hint {hintTier}/{hintTiers.length}: </span>
+            {visibleHint}
           </p>
         </div>
       )}
+    </div>
     </div>
   )
 }

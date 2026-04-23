@@ -31,7 +31,7 @@ function renderLine(
       <span>{before}</span>
       {mode === 'INSERT' ? (
         <>
-          <span className="border-l-2 border-[var(--accent)] animate-pulse" />
+          <span className="border-l-2 border-[var(--accent)] demo-cursor" />
           <span>{cursorChar}</span>
         </>
       ) : mode === 'VISUAL' ? (
@@ -61,11 +61,18 @@ export default function DemoPlayer({ steps }: Props) {
   return (
     <div className="rounded-lg border border-[var(--border)] overflow-hidden mb-10">
 
+      {/* Title bar */}
+      <div className="flex items-center gap-2 px-4 py-2.5 bg-[var(--bg-surface)] border-b border-[var(--border)]">
+        <span className="size-2.5 rounded-full bg-[var(--tn-red)] opacity-70" />
+        <span className="size-2.5 rounded-full bg-[var(--tn-orange)] opacity-70" />
+        <span className="size-2.5 rounded-full bg-[var(--tn-green)] opacity-70" />
+        <span className="flex-1 text-center font-mono text-xs text-[var(--text-secondary)]">Demo</span>
+        <span className="w-[52px]" />
+      </div>
+
       {/* Command sequence bar */}
       <div className="bg-[var(--bg-surface)] px-4 py-3 border-b border-[var(--border)] flex items-center gap-2 flex-wrap">
-        <span className="font-mono text-xs font-semibold uppercase tracking-widest text-[var(--accent)] mr-1">
-          Demo
-        </span>
+        <span className="section-label mr-1">Demo</span>
         {steps.map((s, i) => {
           const label = s.mode === 'INSERT' ? 'EDIT' : s.mode === 'VISUAL' ? 'SELECT' : 'NAV'
           const labelColor = s.mode === 'INSERT' ? 'text-[var(--accent)]' : s.mode === 'VISUAL' ? 'text-purple-400' : 'text-[var(--text-secondary)]'
@@ -74,15 +81,15 @@ export default function DemoPlayer({ steps }: Props) {
               {i > 0 && <span className="text-[var(--border-subtle)] text-xs">→</span>}
               <div className="flex flex-col items-center gap-0.5">
                 {s.key ? (
-                  <kbd className={`inline-flex items-center justify-center px-2 py-0.5 rounded font-mono text-xs border transition-colors ${
+                  <kbd className={`keycap px-2 py-0.5 font-mono text-xs ${
                     i === idx
-                      ? 'bg-[var(--accent)] text-[var(--accent-text)] border-[var(--accent)]'
-                      : 'bg-[var(--bg-active)] text-[var(--text-secondary)] border-[var(--border)]'
+                      ? '!bg-[var(--accent)] !text-[var(--accent-text)] !border-[var(--accent)]'
+                      : ''
                   }`}>
                     {s.key}
                   </kbd>
                 ) : (
-                  <span className={`font-mono text-xs transition-colors ${
+                  <span className={`font-mono text-xs ${
                     i === idx ? 'text-[var(--accent)]' : 'text-[var(--text-secondary)]'
                   }`}>●</span>
                 )}
@@ -122,14 +129,14 @@ export default function DemoPlayer({ steps }: Props) {
         <button
           onClick={() => setIdx((i) => Math.max(0, i - 1))}
           disabled={idx === 0}
-          className="font-mono text-xs px-3 py-1.5 rounded border border-[var(--border)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:border-[var(--border-subtle)] disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+          className="font-mono text-xs px-3 py-1.5 rounded border border-[var(--border)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:border-[var(--border-subtle)] disabled:opacity-30 disabled:cursor-not-allowed"
         >
           ← Prev
         </button>
         <button
           onClick={() => setIdx((i) => Math.min(steps.length - 1, i + 1))}
           disabled={idx === steps.length - 1}
-          className="font-mono text-xs px-3 py-1.5 rounded border border-[var(--border)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:border-[var(--border-subtle)] disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+          className="font-mono text-xs px-3 py-1.5 rounded border border-[var(--border)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:border-[var(--border-subtle)] disabled:opacity-30 disabled:cursor-not-allowed"
         >
           Next →
         </button>

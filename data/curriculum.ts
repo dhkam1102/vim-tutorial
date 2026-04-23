@@ -9,11 +9,30 @@ export type DemoStep = {
 export type NavigationTarget = {
   target: [number, number]
   idealKeystrokes: number
+  allowedKeys?: string[]
+}
+
+export type MultiStepStep = {
+  textEquals?: string
+  textMatches?: RegExp
+  cursor?: [number, number]
+  mode?: 'NORMAL' | 'INSERT' | 'VISUAL'
+  idealKeystrokes?: number
+  label?: string
 }
 
 export type ExerciseGoal =
-  | { type: 'mode-sequence'; sequence: ('NORMAL' | 'INSERT' | 'VISUAL')[]; reps: number }
+  | {
+      type: 'mode-sequence'
+      sequence: ('NORMAL' | 'INSERT' | 'VISUAL' | 'VISUAL_LINE')[]
+      reps: number
+      idealKeystrokes?: number
+      contentCheck?: (finalText: string, initialText: string) => boolean
+    }
   | { type: 'cursor-reach'; targets: NavigationTarget[] }
+  | { type: 'text-equals'; expected: string; idealKeystrokes: number; requireNormalOnExit?: boolean }
+  | { type: 'text-matches'; pattern: RegExp; idealKeystrokes: number; requireNormalOnExit?: boolean }
+  | { type: 'multi-step'; steps: MultiStepStep[] }
   | { type: 'manual' }
 
 export type Lesson = {
@@ -26,6 +45,7 @@ export type Lesson = {
     initialText: string
     instructions: string
     hint?: string
+    hints?: string[]
     goal?: ExerciseGoal
   }
 }
@@ -212,8 +232,8 @@ name = ""`,
         exercise: {
           initialText: `x = 1
 z = 3`,
-          instructions: 'Place your cursor on "First line" and press o to open a new line below it. Type "Second line".',
-          hint: 'Press o while on line 1, type "Second line", then Esc.',
+          instructions: 'With your cursor on line 1 (x = 1), press o to open a new line below and type y = 2. Press Esc.',
+          hint: 'Press o on line 1, type y = 2, then Esc.',
           goal: { type: 'mode-sequence', sequence: ['INSERT', 'NORMAL'], reps: 3 },
         },
       },
@@ -232,8 +252,8 @@ z = 3`,
         exercise: {
           initialText: `mesage = "Hellp, World!"
 primt(mesage)`,
-          instructions: 'Fix the typos: "Hellp" → "Hello", "iz" → "is", "testt" → "test". Use r to replace single characters and x to delete extras.',
-          hint: 'Move to the p in "Hellp", press r then o. Move to z, press r then s. Move to the extra t, press x.',
+          instructions: 'Fix the typos: "Hellp" → "Hello" (use r), "mesage" → "message" (insert s with i or s), "primt" → "print" (swap m for n with r).',
+          hint: 'Move to p in "Hellp", press r then o. Between m and e in "mesage", press i then type s. On m in "primt", press r then n.',
           goal: { type: 'manual' },
         },
       },
@@ -940,8 +960,8 @@ author = "Unknown"`,
     "greeting": 'Hello',
     "city": "New York",
 }`,
-          instructions: 'Practice ci" on name, ci\' on greeting, and ci` on template. Change each string value.',
-          hint: 'Move to each string, use the matching ci operator for that quote type.',
+          instructions: 'Practice ci" on the "Alice" string, ci\' on the \'Hello\' string, and ci" again on "New York". Change each value.',
+          hint: 'Move into each string, press ci followed by the matching quote character, type a new value, Esc.',
           goal: { type: 'manual' },
         },
         demo: [
@@ -1003,8 +1023,8 @@ This has an unwanted word in it.`,
         exercise: {
           initialText: `my_variable = get_value()
 another_thing = 100`,
-          instructions: 'Use ciw to rename "myVariable" to "count" and "anotherThing" to "total".',
-          hint: 'Move anywhere on "myVariable", press ciw, type "count", Esc. Repeat.',
+          instructions: 'Use ciw to rename "my_variable" to "count" and "another_thing" to "total".',
+          hint: 'Move anywhere on "my_variable", press ciw, type "count", Esc. Repeat for the other line.',
           goal: { type: 'manual' },
         },
         demo: [
@@ -1135,8 +1155,8 @@ def body():
 
 def footer():
     return render_footer()`,
-          instructions: 'Use dip to delete the "Main section" block, and cip to replace the "Footer section" block with new text.',
-          hint: 'dip on main block, then cip on footer block.',
+          instructions: 'Use dip to delete the body() block, and cip to replace the footer() block with new text.',
+          hint: 'Move into body(), press dip. Move into footer(), press cip, type new text, Esc.',
           goal: { type: 'manual' },
         },
         demo: [
