@@ -66,7 +66,7 @@ export const curriculum: Section[] = [
         title: 'Intro to Modes',
         keys: ['modes'],
         description:
-          'Vim has three main modes.\n\n**Normal mode** is the default — navigate and run commands here.\n**Insert mode** is for typing text.\n**Visual mode** is for selecting.\nYou switch between them with specific keys.',
+          'Vim has three main modes.\n\n**Normal mode** is the default. Navigate and run commands here.\n**Insert mode** is for typing text.\n**Visual mode** is for selecting.\nYou switch between them with specific keys.',
         demo: [
           {
             mode: 'NORMAL',
@@ -79,7 +79,7 @@ export const curriculum: Section[] = [
             mode: 'INSERT',
             text: 'name = "Alice"\nage = 30\nactive = True',
             cursor: [0, 0],
-            description: 'Insert mode. Cursor is now a line — you can type.',
+            description: 'Insert mode. Cursor is now a line: you can type.',
           },
           {
             key: 'type',
@@ -148,7 +148,7 @@ active = True`,
         demo: [
           { mode: 'NORMAL', text: 'greeting = "Hello, World!"', cursor: [0, 0], description: 'Cursor on g of greeting.' },
           { key: 'w', mode: 'NORMAL', text: 'greeting = "Hello, World!"', cursor: [0, 9], description: 'w jumps to next word (=).' },
-          { key: 'w', mode: 'NORMAL', text: 'greeting = "Hello, World!"', cursor: [0, 11], description: 'w again — jumps to ".' },
+          { key: 'w', mode: 'NORMAL', text: 'greeting = "Hello, World!"', cursor: [0, 11], description: 'w again, jumps to "' },
           { key: 'e', mode: 'NORMAL', text: 'greeting = "Hello, World!"', cursor: [0, 16], description: 'e jumps to end of next word.' },
           { key: 'b', mode: 'NORMAL', text: 'greeting = "Hello, World!"', cursor: [0, 12], description: 'b jumps back one word.' },
         ],
@@ -201,7 +201,7 @@ name = ""`,
         title: 'Insert at Line Ends',
         keys: ['I', 'A', 'esc'],
         description:
-          '**I** and **A** jump to a line end before entering Insert mode.\n\n**I** goes to the first non-blank character on the line.\n**A** goes to the end of the line.\nNo need to press Home or End manually.',
+          '**I** and **A** jump to specific positions on the line before entering Insert mode.\n\n**I** goes to the first non-blank character on the line.\n**A** goes to the end of the line.\nNo need to press Home or End manually.',
         demo: [
           { mode: 'NORMAL', text: 'def greet():\n    print("Hello")\n    return "done"', cursor: [1, 0], description: 'Cursor at start of line 2.' },
           { key: 'A', mode: 'INSERT', text: 'def greet():\n    print("Hello")\n    return "done"', cursor: [1, 18], description: 'A jumps to end of line, enters EDIT.' },
@@ -224,7 +224,7 @@ name = ""`,
         description:
           '**o** and **O** open a new line and drop you straight into Insert mode.\n\n**o** opens a line below the current one.\n**O** opens a line above.\nNo need to go to the end of the line and press Enter.',
         demo: [
-          { mode: 'NORMAL', text: 'x = 1\nz = 3', cursor: [0, 0], description: 'Two lines — line 2 is missing.' },
+          { mode: 'NORMAL', text: 'x = 1\nz = 3', cursor: [0, 0], description: 'Two lines (line 2 is missing).' },
           { key: 'o', mode: 'INSERT', text: 'x = 1\n\nz = 3', cursor: [1, 0], description: 'o opens a new line below, enters EDIT.' },
           { key: 'type', mode: 'INSERT', text: 'x = 1\ny = 2\nz = 3', cursor: [1, 5], description: 'Type the missing line.' },
           { key: 'Esc', mode: 'NORMAL', text: 'x = 1\ny = 2\nz = 3', cursor: [1, 4], description: 'Back to NAV.' },
@@ -246,7 +246,7 @@ z = 3`,
         demo: [
           { mode: 'NORMAL', text: 'primt("Hello")\nmesage = "World"', cursor: [0, 4], description: 'Cursor on the typo t in primt.' },
           { key: 'r', mode: 'NORMAL', text: 'primt("Hello")\nmesage = "World"', cursor: [0, 4], description: 'r waits for a replacement char.' },
-          { key: 'n', mode: 'NORMAL', text: 'print("Hello")\nmesage = "World"', cursor: [0, 4], description: 'Typed n — fixed in place, still NAV.' },
+          { key: 'n', mode: 'NORMAL', text: 'print("Hello")\nmesage = "World"', cursor: [0, 4], description: 'Typed n, fixed in place, still NAV.' },
           { key: 'x', mode: 'NORMAL', text: 'print("Hello")\nmsage = "World"', cursor: [1, 1], description: 'x deletes the char under cursor.' },
         ],
         exercise: {
@@ -268,7 +268,7 @@ primt(mesage)`,
         title: 'Moving by WORDs',
         keys: ['W', 'E', 'B'],
         description:
-          'Lowercase w/e/b stop at punctuation. Uppercase does not.\n\n**W**, **E**, **B** move by WORDs — only whitespace counts as a separator.\nUseful for jumping over things like `function.name()` as one unit.',
+          'Lowercase w/e/b stop at punctuation. Uppercase does not.\n\n**W**, **E**, **B** move by WORDs (only whitespace counts as a separator).\nUseful for jumping over things like `function.name()` as one unit.',
         demo: [
           { mode: 'NORMAL', text: 'url = "https://example.com"  # endpoint', cursor: [0, 7], description: 'Cursor on h of the URL.' },
           { key: 'w', mode: 'NORMAL', text: 'url = "https://example.com"  # endpoint', cursor: [0, 12], description: 'w stops at : (punctuation).' },
@@ -327,11 +327,11 @@ response = requests.get(url).json()`,
         title: 'Find Character',
         keys: ['f', 'F', ';'],
         description:
-          '**f** jumps to a character on the current line.\n\n**f{char}** moves forward to the next occurrence of that character.\n**F{char}** searches backward.\n**;** repeats the last search in the same direction.',
+          '**f** jumps to a character on the current line.\n\n**f{char}** moves forward to the next occurrence of that character.\n**F{char}** moves backward to the character, landing on it.\n**;** repeats the last search in the same direction.',
         demo: [
           { mode: 'NORMAL', text: 'def calc(price, tax, discount):', cursor: [0, 0], description: 'Cursor at start of line.' },
           { key: 'f,', mode: 'NORMAL', text: 'def calc(price, tax, discount):', cursor: [0, 14], description: 'f, jumps to the first comma.' },
-          { key: ';', mode: 'NORMAL', text: 'def calc(price, tax, discount):', cursor: [0, 19], description: '; repeats — jumps to next comma.' },
+          { key: ';', mode: 'NORMAL', text: 'def calc(price, tax, discount):', cursor: [0, 19], description: '; repeats, jumps to next comma.' },
           { key: 'F,', mode: 'NORMAL', text: 'def calc(price, tax, discount):', cursor: [0, 14], description: 'F, searches backward.' },
         ],
         exercise: {
@@ -356,7 +356,7 @@ response = requests.get(url).json()`,
         title: 'Till Character',
         keys: ['t', 'T', ';'],
         description:
-          '**t** is like **f**, but stops one character short.\n\n**t{char}** moves the cursor just before the target character.\n**T{char}** does the same thing backward.\nOften more useful than f when you want to land right before something.',
+          '**t** is like **f**, but stops one character short.\n\n**t{char}** moves the cursor just before the target character.\n**T{char}** does the same thing backward, stopping one character to the right of the target.\nOften more useful than f when you want to land right before something.',
         demo: [
           { mode: 'NORMAL', text: 'result = do_something(value, callback)', cursor: [0, 0], description: 'Cursor at start.' },
           { key: 'f)', mode: 'NORMAL', text: 'result = do_something(value, callback)', cursor: [0, 37], description: 'f) lands ON the ).' },
@@ -390,7 +390,7 @@ response = requests.get(url).json()`,
         title: 'Intro to Operators',
         keys: ['operators'],
         description:
-          'Operators combine with motions to act on text.\n\n**d** deletes, **c** changes, **y** yanks (copies).\nThe pattern is always: operator + motion.\n`dw` deletes a word, `d$` deletes to end of line — that\'s the grammar of Vim.',
+          'Operators combine with motions to act on text.\n\n**d** deletes, **c** changes, **y** yanks (copies).\nThe pattern is always: operator + motion.\n`dw` deletes a word, `d$` deletes to end of line. That\'s the grammar of Vim.',
         demo: [
           { mode: 'NORMAL', text: 'delete this word now\nchange this value\nyank this line', cursor: [0, 7], description: 'Cursor on "this".' },
           { key: 'dw', mode: 'NORMAL', text: 'delete word now\nchange this value\nyank this line', cursor: [0, 7], description: 'd + w = delete word.' },
@@ -401,7 +401,7 @@ response = requests.get(url).json()`,
           initialText: `delete this entire word please
 change this word too
 yank this line`,
-          instructions: 'Read this lesson — the next lessons will practice each operator. For now, try dw on "entire" to delete it.',
+          instructions: 'Read this lesson. The next lessons will practice each operator. For now, try dw on "entire" to delete it.',
           hint: 'Move to "entire", press dw to delete the word.',
           goal: { type: 'manual' },
         },
@@ -411,7 +411,7 @@ yank this line`,
         title: 'Delete Words',
         keys: ['d', 'w'],
         description:
-          '**dw** and friends delete by motion.\n\n**dw** deletes from the cursor to the start of the next word.\n**de** deletes to the end of the current word.\n**dW** deletes the whole WORD.\nPrefix with a count: **3dw** deletes 3 words at once.\n\nTip: **dw** from mid-word only deletes to the end of that word — use **diw** when you want the whole word no matter where the cursor sits.',
+          '**dw** and friends delete by motion.\n\n**dw** deletes from the cursor to the start of the next word (including trailing whitespace).\n**de** deletes to the end of the current word.\n**dW** deletes the whole WORD.\nPrefix with a count: **3dw** deletes 3 words at once.\n\nTip: **dw** from mid-word only deletes to the end of that word. Use **diw** when you want the whole word no matter where the cursor sits.',
         demo: [
           { mode: 'NORMAL', text: 'name = extra_value\nage = 30', cursor: [0, 7], description: 'Cursor on extra_value.' },
           { key: 'dw', mode: 'NORMAL', text: 'name = value\nage = 30', cursor: [0, 7], description: 'dw deletes to start of next word.' },
@@ -430,7 +430,7 @@ Also delete these three unnecessary filler words here.`,
         title: 'Change Words',
         keys: ['c', 'w'],
         description:
-          '**cw** is like **dw** but drops you into Insert mode after.\n\n**cw** deletes the word and enters Insert mode so you can type a replacement.\n**ce** changes to the end of the word.\n**cW** changes the whole WORD.\n\nQuirk: **cw** behaves like **ce** — it stops at the end of the word, not at the start of the next one, so it doesn\'t eat the trailing space.',
+          '**cw** is like **dw** but drops you into Insert mode after.\n\n**cw** deletes the word and enters Insert mode so you can type a replacement.\n**ce** changes to the end of the word.\n**cW** changes the whole WORD.\n\nQuirk: **cw** behaves like **ce**: it stops at the end of the word, not at the start of the next one, so it doesn\'t eat the trailing space.',
         demo: [
           { mode: 'NORMAL', text: 'foo = "bar"\nbaz = 100', cursor: [0, 0], description: 'Cursor on foo.' },
           { key: 'cw', mode: 'INSERT', text: ' = "bar"\nbaz = 100', cursor: [0, 0], description: 'cw deletes word, enters EDIT.' },
@@ -598,7 +598,7 @@ import subprocess  # bottom of file`,
         demo: [
           { mode: 'NORMAL', text: 'def setup():\n    config = load()\n\ndef main():\n    run()\n\ndef teardown():\n    cleanup()', cursor: [0, 0], description: 'Cursor at top of first function.' },
           { key: '}', mode: 'NORMAL', text: 'def setup():\n    config = load()\n\ndef main():\n    run()\n\ndef teardown():\n    cleanup()', cursor: [2, 0], description: '} jumps to next blank line.' },
-          { key: '}', mode: 'NORMAL', text: 'def setup():\n    config = load()\n\ndef main():\n    run()\n\ndef teardown():\n    cleanup()', cursor: [5, 0], description: '} again — next blank line.' },
+          { key: '}', mode: 'NORMAL', text: 'def setup():\n    config = load()\n\ndef main():\n    run()\n\ndef teardown():\n    cleanup()', cursor: [5, 0], description: '} again, next blank line.' },
           { key: '{', mode: 'NORMAL', text: 'def setup():\n    config = load()\n\ndef main():\n    run()\n\ndef teardown():\n    cleanup()', cursor: [2, 0], description: '{ jumps back up.' },
         ],
         exercise: {
@@ -631,7 +631,7 @@ def teardown():
         title: 'Window Scrolls',
         keys: ['Ctrl+u', 'Ctrl+d'],
         description:
-          '**Ctrl+d** and **Ctrl+u** scroll the viewport half a screen at a time.\n\n**Ctrl+d** scrolls down.\n**Ctrl+u** scrolls up.\nThe cursor moves with it — much faster than holding j or k on long files.',
+          '**Ctrl+d** and **Ctrl+u** scroll the viewport half a screen at a time.\n\n**Ctrl+d** scrolls down.\n**Ctrl+u** scrolls up.\nThe cursor moves with it. Much faster than holding j or k on long files.',
         demo: [
           { mode: 'NORMAL', text: 'x_1 = 7\nx_2 = 14\nx_3 = 21\nx_4 = 28\n# ... 40 lines total', cursor: [0, 0], description: '40-line file. Cursor at top.' },
           { key: 'Ctrl+d', mode: 'NORMAL', text: 'x_20 = 140\nx_21 = 147\nx_22 = 154\nx_23 = 161\n# ... continues', cursor: [0, 0], description: 'Ctrl+d scrolls half a screen down.' },
@@ -660,7 +660,7 @@ def teardown():
           { mode: 'NORMAL', text: 'def greet(name):\n    message = "Hello"\n    print(message)\n    return message', cursor: [0, 0], description: 'Cursor at top.' },
           { key: '/message', mode: 'NORMAL', text: 'def greet(name):\n    message = "Hello"\n    print(message)\n    return message', cursor: [1, 4], description: '/message jumps to first match.' },
           { key: 'n', mode: 'NORMAL', text: 'def greet(name):\n    message = "Hello"\n    print(message)\n    return message', cursor: [2, 10], description: 'n jumps to next match.' },
-          { key: 'n', mode: 'NORMAL', text: 'def greet(name):\n    message = "Hello"\n    print(message)\n    return message', cursor: [3, 11], description: 'n again — next match.' },
+          { key: 'n', mode: 'NORMAL', text: 'def greet(name):\n    message = "Hello"\n    print(message)\n    return message', cursor: [3, 11], description: 'n again, next match.' },
         ],
         exercise: {
           initialText: `def greet(name):
@@ -677,7 +677,7 @@ def teardown():
         title: 'Repeat Search',
         keys: ['n', 'N'],
         description:
-          'After a search, **n** and **N** cycle through every match.\n\n**n** jumps to the next match.\n**N** jumps to the previous one.\nUse them to step through all occurrences in the file.',
+          'After a search, **n** and **N** cycle through every match.\n\n**n** repeats the search in the same direction (forward after /, backward after ?).\n**N** repeats in the opposite direction.\nUse them to step through all occurrences in the file.',
         exercise: {
           initialText: `count = 1
 total = count + count
@@ -689,9 +689,9 @@ return count`,
         },
         demo: [
           { mode: 'NORMAL', text: 'count = 1\ntotal = count + count\nprint(count, total)\nreturn count', cursor: [0, 0], description: 'count appears 4 times in this file.' },
-          { key: '/count', mode: 'NORMAL', text: 'count = 1\ntotal = count + count\nprint(count, total)\nreturn count', cursor: [0, 0], description: '/count Enter — first match highlighted.' },
+          { key: '/count', mode: 'NORMAL', text: 'count = 1\ntotal = count + count\nprint(count, total)\nreturn count', cursor: [0, 0], description: '/count Enter: first match highlighted.' },
           { key: 'n', mode: 'NORMAL', text: 'count = 1\ntotal = count + count\nprint(count, total)\nreturn count', cursor: [1, 8], description: 'n jumps to next match.' },
-          { key: 'n', mode: 'NORMAL', text: 'count = 1\ntotal = count + count\nprint(count, total)\nreturn count', cursor: [1, 16], description: 'n again — third occurrence.' },
+          { key: 'n', mode: 'NORMAL', text: 'count = 1\ntotal = count + count\nprint(count, total)\nreturn count', cursor: [1, 16], description: 'n again, third occurrence.' },
           { key: 'N', mode: 'NORMAL', text: 'count = 1\ntotal = count + count\nprint(count, total)\nreturn count', cursor: [1, 8], description: 'N goes backward to previous match.' },
         ],
       },
@@ -700,7 +700,7 @@ return count`,
         title: 'Quick Word Search',
         keys: ['*', '#'],
         description:
-          '**\\*** and **#** search for the word under the cursor without typing anything.\n\n**\\*** searches forward for the current word.\n**#** searches backward.\nJust position your cursor on the word and press.\n\nNote: **\\*** matches whole words only — searching on `user` won\'t find `users`. Use **g\\*** if you want a substring match.',
+          '**\\*** and **#** search for the word under the cursor without typing anything.\n\n**\\*** searches forward for the current word.\n**#** searches backward.\nJust position your cursor on the word and press.\n\nNote: **\\*** matches whole words only (searching on `user` won\'t find `users`). Use **g\\*** if you want a substring match.',
         exercise: {
           initialText: `user = get_user(id)
 if user:
@@ -752,7 +752,7 @@ if user:
         title: 'Intro to Text Objects',
         keys: ['text objects'],
         description:
-          'Text objects let you select structured chunks of text.\n\nThey work with operators: **d**, **c**, **y** + text object.\n**i** means "inside" — without the delimiters.\n**a** means "around" — including the delimiters.',
+          'Text objects let you select structured chunks of text.\n\nThey work with operators: **d**, **c**, **y** + text object.\n**i** means "inside" (without the delimiters).\n**a** means "around" (including the delimiters).',
         exercise: {
           initialText: `config = {"name": "Alice", "age": 30}
 print(config)`,
@@ -762,7 +762,7 @@ print(config)`,
         },
         demo: [
           { mode: 'NORMAL', text: 'config = {"name": "Alice", "age": 30}', cursor: [0, 10], description: 'Cursor inside the { } block.' },
-          { key: 'di{', mode: 'NORMAL', text: 'config = {}', cursor: [0, 9], description: 'di{ deletes inside — braces stay.' },
+          { key: 'di{', mode: 'NORMAL', text: 'config = {}', cursor: [0, 9], description: 'di{ deletes inside, braces stay.' },
           { key: 'u', mode: 'NORMAL', text: 'config = {"name": "Alice", "age": 30}', cursor: [0, 10], description: 'u undoes. Try da{ instead.' },
           { key: 'da{', mode: 'NORMAL', text: 'config = ', cursor: [0, 8], description: 'da{ removes braces and everything inside.' },
         ],
@@ -785,7 +785,7 @@ print(config)`,
         },
         demo: [
           { mode: 'NORMAL', text: 'config = {\n    "theme": "dark",\n    "language": "en",\n    "debug": True,\n}', cursor: [1, 4], description: 'Cursor anywhere inside { }.' },
-          { key: 'di{', mode: 'NORMAL', text: 'config = {\n}', cursor: [0, 9], description: 'di{ deletes contents — braces remain.' },
+          { key: 'di{', mode: 'NORMAL', text: 'config = {\n}', cursor: [0, 9], description: 'di{ deletes contents, braces remain.' },
         ],
       },
       {
@@ -800,7 +800,7 @@ print(config)`,
     "port": 8080,
 }`,
           instructions: 'Place cursor inside the {} block and press da{ to delete the braces and their contents.',
-          hint: 'Move inside {}, press da{ — it removes { ... } entirely.',
+          hint: 'Move inside {}, press da{: it removes { ... } entirely.',
           goal: { type: 'manual' },
         },
         demo: [
@@ -865,7 +865,7 @@ print(config)`,
           { mode: 'NORMAL', text: 'def process(input):\n    data = transform([1, 2, 3])\n    return {"result": data}', cursor: [0, 12], description: 'Cursor inside ( ) params.' },
           { key: 'di(', mode: 'NORMAL', text: 'def process():\n    data = transform([1, 2, 3])\n    return {"result": data}', cursor: [0, 12], description: 'di( deletes inside the parentheses.' },
           { key: 'u', mode: 'NORMAL', text: 'def process(input):\n    data = transform([1, 2, 3])\n    return {"result": data}', cursor: [1, 20], description: 'Undo. Now di[ on the array.' },
-          { key: 'di[', mode: 'NORMAL', text: 'def process(input):\n    data = transform([])\n    return {"result": data}', cursor: [1, 20], description: 'di[ empties the list — brackets stay.' },
+          { key: 'di[', mode: 'NORMAL', text: 'def process(input):\n    data = transform([])\n    return {"result": data}', cursor: [1, 20], description: 'di[ empties the list: brackets stay.' },
         ],
       },
     ],
@@ -965,7 +965,7 @@ author = "Unknown"`,
           goal: { type: 'manual' },
         },
         demo: [
-          { mode: 'NORMAL', text: 'data = {\n    "name": "Alice",\n    "greeting": \'Hello\',\n}', cursor: [1, 12], description: 'Cursor on "Alice" — double quotes.' },
+          { mode: 'NORMAL', text: 'data = {\n    "name": "Alice",\n    "greeting": \'Hello\',\n}', cursor: [1, 12], description: 'Cursor on "Alice" (double quotes).' },
           { key: 'ci"', mode: 'INSERT', text: 'data = {\n    "name": "",\n    "greeting": \'Hello\',\n}', cursor: [1, 12], description: 'ci" clears inside double quotes.' },
           { key: 'Esc', mode: 'NORMAL', text: 'data = {\n    "name": "Bob",\n    "greeting": \'Hello\',\n}', cursor: [1, 12], description: 'Typed "Bob", Esc. Now ci\' on greeting.' },
           { key: "ci'", mode: 'INSERT', text: 'data = {\n    "name": "Bob",\n    "greeting": \'\',\n}', cursor: [2, 16], description: "ci' clears inside single quotes." },
@@ -982,7 +982,7 @@ author = "Unknown"`,
         title: 'Delete Inside Word',
         keys: ['d', 'i', 'w'],
         description:
-          '**diw** deletes the word under the cursor.\n\nThe surrounding whitespace stays intact.\nYour cursor can be anywhere in the word.\n\n**diW** uses the WORD definition from §3 — punctuation is part of the word.',
+          '**diw** deletes the word under the cursor.\n\nThe surrounding whitespace stays intact.\nYour cursor can be anywhere in the word.\n\n**diW** uses the WORD definition from §3 (punctuation is part of the word).',
         exercise: {
           initialText: `Remove the badword from this sentence.
 This has an unwanted word in it.`,
@@ -992,7 +992,7 @@ This has an unwanted word in it.`,
         },
         demo: [
           { mode: 'NORMAL', text: 'Remove the badword from this sentence.', cursor: [0, 11], description: 'Cursor anywhere on "badword".' },
-          { key: 'diw', mode: 'NORMAL', text: 'Remove the  from this sentence.', cursor: [0, 11], description: 'diw deletes the word — spaces stay.' },
+          { key: 'diw', mode: 'NORMAL', text: 'Remove the  from this sentence.', cursor: [0, 11], description: 'diw deletes the word: spaces stay.' },
         ],
       },
       {
@@ -1009,9 +1009,9 @@ This has an unwanted word in it.`,
         },
         demo: [
           { mode: 'NORMAL', text: 'Remove the extra badword from this sentence cleanly.', cursor: [0, 17], description: 'Cursor on "badword".' },
-          { key: 'diw', mode: 'NORMAL', text: 'Remove the extra  from this sentence cleanly.', cursor: [0, 17], description: 'diw — word gone but space stays.' },
+          { key: 'diw', mode: 'NORMAL', text: 'Remove the extra  from this sentence cleanly.', cursor: [0, 17], description: 'diw: word gone but space stays.' },
           { key: 'u', mode: 'NORMAL', text: 'Remove the extra badword from this sentence cleanly.', cursor: [0, 17], description: 'Undo. Try daw instead.' },
-          { key: 'daw', mode: 'NORMAL', text: 'Remove the extra from this sentence cleanly.', cursor: [0, 16], description: 'daw — word and trailing space both gone.' },
+          { key: 'daw', mode: 'NORMAL', text: 'Remove the extra from this sentence cleanly.', cursor: [0, 16], description: 'daw: word and trailing space both gone.' },
         ],
       },
       {
@@ -1038,7 +1038,7 @@ another_thing = 100`,
         title: 'Words Review',
         keys: ['Review'],
         description:
-          'A recap of word text objects.\n\n**diw** deletes the word without touching whitespace.\n**daw** deletes the word and its surrounding space.\n**ciw** changes the word — probably the one you\'ll use most.',
+          'A recap of word text objects.\n\n**diw** deletes the word without touching whitespace.\n**daw** deletes the word and its surrounding space.\n**ciw** changes the word (probably the one you\'ll use most).',
         exercise: {
           initialText: `def calculate_total(price, quantity, discount):
     subtotal = price * quantity
@@ -1082,7 +1082,7 @@ def teardown():
         },
         demo: [
           { mode: 'NORMAL', text: 'def setup():\n    config = load_config()\n\ndef process():\n    result = run()\n    return result\n\ndef teardown():\n    cleanup()', cursor: [3, 0], description: 'Cursor in the process() paragraph.' },
-          { key: 'dip', mode: 'NORMAL', text: 'def setup():\n    config = load_config()\n\n\ndef teardown():\n    cleanup()', cursor: [3, 0], description: 'dip deletes paragraph — blank lines stay.' },
+          { key: 'dip', mode: 'NORMAL', text: 'def setup():\n    config = load_config()\n\n\ndef teardown():\n    cleanup()', cursor: [3, 0], description: 'dip deletes paragraph: blank lines stay.' },
         ],
       },
       {
@@ -1107,7 +1107,7 @@ def save():
         },
         demo: [
           { mode: 'NORMAL', text: 'def load():\n    return read_file()\n\ndef process():\n    data = fetch()\n    return transform(data)\n\ndef save():\n    write_file()', cursor: [3, 0], description: 'Cursor in the process() paragraph.' },
-          { key: 'dip', mode: 'NORMAL', text: 'def load():\n    return read_file()\n\n\ndef save():\n    write_file()', cursor: [3, 0], description: 'dip removes lines — blank line stays.' },
+          { key: 'dip', mode: 'NORMAL', text: 'def load():\n    return read_file()\n\n\ndef save():\n    write_file()', cursor: [3, 0], description: 'dip removes lines: blank line stays.' },
           { key: 'u', mode: 'NORMAL', text: 'def load():\n    return read_file()\n\ndef process():\n    data = fetch()\n    return transform(data)\n\ndef save():\n    write_file()', cursor: [3, 0], description: 'Undo. Try dap instead.' },
           { key: 'dap', mode: 'NORMAL', text: 'def load():\n    return read_file()\n\ndef save():\n    write_file()', cursor: [3, 0], description: 'dap removes paragraph and blank line.' },
         ],
@@ -1218,10 +1218,10 @@ Then try selecting a whole phrase.`,
           goal: { type: 'mode-sequence', sequence: ['VISUAL', 'NORMAL'], reps: 1 },
         },
         demo: [
-          { mode: 'NORMAL', text: 'Select this word carefully.\nThen try selecting a whole phrase.', cursor: [0, 0], description: 'Normal mode — cursor on "S".' },
+          { mode: 'NORMAL', text: 'Select this word carefully.\nThen try selecting a whole phrase.', cursor: [0, 0], description: 'Normal mode, cursor on "S".' },
           { key: 'v', mode: 'VISUAL', text: 'Select this word carefully.\nThen try selecting a whole phrase.', cursor: [0, 0], description: 'v enters Visual mode.' },
           { key: 'w', mode: 'VISUAL', text: 'Select this word carefully.\nThen try selecting a whole phrase.', cursor: [0, 6], description: 'w extends selection by one word.' },
-          { key: 'w', mode: 'VISUAL', text: 'Select this word carefully.\nThen try selecting a whole phrase.', cursor: [0, 11], description: 'w again — selection grows.' },
+          { key: 'w', mode: 'VISUAL', text: 'Select this word carefully.\nThen try selecting a whole phrase.', cursor: [0, 11], description: 'w again. Selection grows.' },
           { key: 'Esc', mode: 'NORMAL', text: 'Select this word carefully.\nThen try selecting a whole phrase.', cursor: [0, 10], description: 'Esc cancels selection, back to Normal.' },
         ],
       },
@@ -1347,7 +1347,7 @@ def second():
         title: 'Undo / Redo',
         keys: ['u', 'Ctrl+r'],
         description:
-          '**u** undoes your last change. **Ctrl+r** redoes it.\n\nPress **u** multiple times to keep going back.\nVim\'s undo history is deep — you can usually go all the way back to when you opened the file.',
+          '**u** undoes your last change. **Ctrl+r** redoes it.\n\nPress **u** multiple times to keep going back.\nVim\'s undo history is deep. You can usually go all the way back to when you opened the file.',
         exercise: {
           initialText: `name = "Alice"
 age = 999
@@ -1368,7 +1368,7 @@ city = "NYC"`,
         title: 'Undo Line Changes',
         keys: ['U'],
         description:
-          '**U** undoes all changes to the current line at once.\n\nUnlike **u**, it doesn\'t step through one change at a time.\nIt restores the entire line to how it was when you moved to it.\n\nNote: **U** itself counts as a change — pressing **u** right after **U** will undo the line-restore.',
+          '**U** undoes all changes to the current line at once.\n\nUnlike **u**, it doesn\'t step through one change at a time.\nIt restores the entire line to how it was when you moved to it.\n\nNote: **U** itself counts as a change, so pressing **u** right after **U** will undo the line-restore.',
         exercise: {
           initialText: `result = calculate_total(price, tax, discount)`,
           instructions: 'Make a few edits on the line (use r, x, or i). Then press U to undo all changes to that line at once.',
@@ -1419,7 +1419,7 @@ city = "NYC"
         title: 'Jump List',
         keys: ['Ctrl+o', 'Ctrl+i'],
         description:
-          'Vim records large jumps in a jump list.\n\n**Ctrl+o** goes back to older positions.\n**Ctrl+i** goes forward.\nAnytime you jump with gg, G, /, or a mark, it gets recorded here.\n\n**Ctrl+i** and Tab share a keycode in most terminals — pressing Tab has the same effect as Ctrl+i.',
+          'Vim records large jumps in a jump list.\n\n**Ctrl+o** goes back to older positions.\n**Ctrl+i** goes forward.\nAnytime you jump with gg, G, /, or a mark, it gets recorded here.\n\n**Ctrl+i** and Tab share a keycode in most terminals (pressing Tab has the same effect as Ctrl+i).',
         exercise: {
           initialText: `# Start here at the top
 import os
@@ -1436,8 +1436,8 @@ result = process()`,
         },
         demo: [
           { mode: 'NORMAL', text: '# Start here at the top\nimport os\n\n# Middle of the file\ndef process():\n    pass\n\n# End of the file\nresult = process()', cursor: [0, 0], description: 'At the top of the file.' },
-          { key: 'G', mode: 'NORMAL', text: '# Start here at the top\nimport os\n\n# Middle of the file\ndef process():\n    pass\n\n# End of the file\nresult = process()', cursor: [8, 0], description: 'G jumps to bottom — recorded in jump list.' },
-          { key: 'gg', mode: 'NORMAL', text: '# Start here at the top\nimport os\n\n# Middle of the file\ndef process():\n    pass\n\n# End of the file\nresult = process()', cursor: [0, 0], description: 'gg jumps to top — also recorded.' },
+          { key: 'G', mode: 'NORMAL', text: '# Start here at the top\nimport os\n\n# Middle of the file\ndef process():\n    pass\n\n# End of the file\nresult = process()', cursor: [8, 0], description: 'G jumps to bottom. Recorded in jump list.' },
+          { key: 'gg', mode: 'NORMAL', text: '# Start here at the top\nimport os\n\n# Middle of the file\ndef process():\n    pass\n\n# End of the file\nresult = process()', cursor: [0, 0], description: 'gg jumps to top. Also recorded.' },
           { key: 'Ctrl+o', mode: 'NORMAL', text: '# Start here at the top\nimport os\n\n# Middle of the file\ndef process():\n    pass\n\n# End of the file\nresult = process()', cursor: [8, 0], description: 'Ctrl+o goes back to bottom.' },
           { key: 'Ctrl+i', mode: 'NORMAL', text: '# Start here at the top\nimport os\n\n# Middle of the file\ndef process():\n    pass\n\n# End of the file\nresult = process()', cursor: [0, 0], description: 'Ctrl+i goes forward again.' },
         ],
