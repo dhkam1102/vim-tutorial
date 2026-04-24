@@ -19,21 +19,11 @@ function GearIcon() {
   )
 }
 
-function StarsDisplay({ stars, small = false }: { stars: 1 | 2 | 3; small?: boolean }) {
-  return (
-    <span className={`inline-flex gap-0.5 ${small ? 'text-xs' : 'text-sm'}`} aria-label={`${stars} out of 3 stars`}>
-      {[1, 2, 3].map((i) => (
-        <span key={i} className={i <= stars ? 'star-filled' : 'star-empty'}>★</span>
-      ))}
-    </span>
-  )
-}
-
 export default function Sidebar({ onCollapse }: { onCollapse?: () => void }) {
   const pathname = usePathname()
   const { theme, setTheme } = useTheme()
-  const { fontSize, setFontSize, lineNumbers, setLineNumbers } = usePreferences()
-  const { getStars } = useProgress()
+  const { editorHeight, setEditorHeight, fontSize, setFontSize, lineNumbers, setLineNumbers } = usePreferences()
+  const { isCompleted } = useProgress()
   const [settingsOpen, setSettingsOpen] = useState(false)
 
   return (
@@ -72,7 +62,7 @@ export default function Sidebar({ onCollapse }: { onCollapse?: () => void }) {
                 {section.lessons.map((lesson, li) => {
                   const href = `/lessons/${section.id}/${lesson.id}`
                   const isActive = pathname === href
-                  const stars = getStars(section.id, lesson.id)
+                  const done = isCompleted(section.id, lesson.id)
                   return (
                     <li key={lesson.id} className="fade-up" style={{ animationDelay: `${(si * 4 + li) * 0.015}s` }}>
                       <Link
@@ -86,7 +76,7 @@ export default function Sidebar({ onCollapse }: { onCollapse?: () => void }) {
                       >
                         <span className="truncate">{lesson.title}</span>
                         <span className="flex items-center gap-1.5 shrink-0">
-                          {stars !== null && <StarsDisplay stars={stars} small />}
+                          {done && <span className="text-xs font-semibold text-[var(--tn-green)]">✓</span>}
                           {lesson.keys.slice(0, 2).map((k, i) => (
                             <KeyBadge key={i} keyName={k} />
                           ))}
@@ -164,6 +154,27 @@ export default function Sidebar({ onCollapse }: { onCollapse?: () => void }) {
                     }`}
                   >
                     {v ? 'On' : 'Off'}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Editor height */}
+            <div className="flex items-center justify-between">
+              <span className="font-mono text-sm text-[var(--text-secondary)]">Editor height</span>
+              <div className="flex items-center gap-0.5 bg-[var(--bg-active)] rounded p-0.5" role="group" aria-label="Choose editor height">
+                {(['sm', 'md', 'lg'] as const).map((h) => (
+                  <button
+                    key={h}
+                    onClick={() => setEditorHeight(h)}
+                    aria-pressed={editorHeight === h}
+                    className={`font-mono text-xs px-3 py-1 rounded uppercase transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] ${
+                      editorHeight === h
+                        ? 'bg-[var(--accent)] text-[var(--accent-text)] font-semibold'
+                        : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
+                    }`}
+                  >
+                    {h}
                   </button>
                 ))}
               </div>

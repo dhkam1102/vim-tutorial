@@ -4,25 +4,27 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { EditorState, StateField, StateEffect, RangeSet } from '@codemirror/state'
 import { EditorView, keymap, lineNumbers, highlightActiveLine, Decoration, DecorationSet } from '@codemirror/view'
 import { defaultKeymap, historyKeymap, history } from '@codemirror/commands'
-import { vim, getCM } from '@replit/codemirror-vim'
-import { oneDark } from '@codemirror/theme-one-dark'
+import { vim, getCM, Vim } from '@replit/codemirror-vim'
+import { oneDarkHighlightStyle } from '@codemirror/theme-one-dark'
+import { syntaxHighlighting } from '@codemirror/language'
 import { python } from '@codemirror/lang-python'
 import { useTheme } from '@/context/ThemeContext'
-import { usePreferences, EDITOR_HEIGHT_MAP } from '@/context/PreferencesContext'
+import { usePreferences } from '@/context/PreferencesContext'
 import type { ExerciseGoal } from '@/data/curriculum'
 
 export type { ExerciseGoal }
 
-export type ExerciseResult =
-  | { type: 'navigation'; stars: 1 | 2 | 3 }
-  | { type: 'mode'; stars: 1 | 2 | 3 }
-  | { type: 'edit'; stars: 1 | 2 | 3 }
-  | { type: 'multi'; stars: 1 | 2 | 3 }
-  | { type: 'manual' }
+export type ExerciseScore = {
+  score: number
+  keysUsed: number
+  idealKeys: number
+  efficiency: number
+  speedScore: number
+  totalMs: number
+}
 
 const setTargetEffect = StateEffect.define<number>()
-const MS_PER_IDEAL_KEY = 900
-const BLOCKED_NAV_KEYS = new Set(['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'PageUp', 'PageDown', 'Home', 'End'])
+const BLOCKED_VIM_NAV_KEYS = new Set(['<Up>', '<Down>', '<Left>', '<Right>', '<PageUp>', '<PageDown>', '<Home>', '<End>'])
 
 function isSubsequence(seq: string[], hist: string[]): boolean {
   let si = 0
@@ -32,25 +34,14 @@ function isSubsequence(seq: string[], hist: string[]): boolean {
   return si === seq.length
 }
 
-function computeStars(
-  actualKeystrokes: number,
-  idealKeystrokes: number,
-  totalMs: number,
-  hintTier: number,
-  resetUsed: boolean,
-): 1 | 2 | 3 {
-  if (actualKeystrokes === 0) return 1
-  const keystrokeEff = Math.min(1, idealKeystrokes / actualKeystrokes)
-  const idealMs = idealKeystrokes * MS_PER_IDEAL_KEY
-  const timeEff = Math.min(1, idealMs / Math.max(totalMs, 1))
-  const score = keystrokeEff * 0.7 + timeEff * 0.3
-  const rawStars: 1 | 2 | 3 = score >= 0.85 ? 3 : score >= 0.60 ? 2 : 1
-  let capped: 1 | 2 | 3 = rawStars
-  if (resetUsed) capped = Math.min(capped, 2) as 1 | 2
-  if (hintTier >= 3) capped = 1
-  else if (hintTier === 2) capped = Math.min(capped, 2) as 1 | 2
-  // tier 1 = nudge, no cap
-  return capped
+function computeScore(actual: number, ideal: number, totalMs: number): ExerciseScore {
+  const eff = actual > 0 ? Math.max(50, Math.min(100, (ideal / actual) * 100)) : 50
+  const targetMs = ideal * 800
+  const ratio = totalMs / Math.max(targetMs, 1)
+  const speedScore = ratio <= 1 ? 100 : ratio <= 2 ? 80 : ratio <= 3 ? 60 : 50
+  const score = Math.round(eff * 0.6 + speedScore * 0.4)
+
+  return { score, keysUsed: actual, idealKeys: ideal, efficiency: Math.round(eff), speedScore, totalMs }
 }
 
 type VimEditorProps = {
@@ -59,7 +50,9 @@ type VimEditorProps = {
   hint?: string
   hints?: string[]
   goal?: ExerciseGoal
-  onComplete?: (result: ExerciseResult) => void
+  overlay?: React.ReactNode
+  onComplete?: (score: ExerciseScore | null) => void
+  onViewResults?: () => void
   onHintUsed?: () => void
   onReset?: () => void
 }
@@ -84,12 +77,16 @@ export default function VimEditor({
   hint,
   hints,
   goal,
+  overlay,
   onComplete,
+  onViewResults,
   onHintUsed,
   onReset,
 }: VimEditorProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const viewRef = useRef<EditorView | null>(null)
+  const onCompleteRef = useRef(onComplete)
+  onCompleteRef.current = onComplete
   const completedRef = useRef(false)
   const hintTierRef = useRef(0)
   const resetUsedRef = useRef(false)
@@ -118,33 +115,39 @@ export default function VimEditor({
   const [targetsHit, setTargetsHit] = useState(0)
   const [modeRepsDisplay, setModeRepsDisplay] = useState(0)
   const [stepIdx, setStepIdx] = useState(0)
-  const [gradeLabel, setGradeLabel] = useState<string | null>(null)
+  const [hasScore, setHasScore] = useState(false)
+  const [blockedMsg, setBlockedMsg] = useState<string | null>(null)
+  const blockedTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   const { theme } = useTheme()
   const { editorHeight, fontSize, lineNumbers: showLineNumbers } = usePreferences()
 
-  const [height, setHeight] = useState(EDITOR_HEIGHT_MAP[editorHeight])
   const isDragging = useRef(false)
   const dragStartY = useRef(0)
   const dragStartHeight = useRef(0)
 
-  useEffect(() => {
-    setHeight(EDITOR_HEIGHT_MAP[editorHeight])
-  }, [editorHeight])
-
   const onDragMouseDown = useCallback((e: React.MouseEvent) => {
+    const el = containerRef.current
+    if (!el) return
     isDragging.current = true
     dragStartY.current = e.clientY
-    dragStartHeight.current = height
+    dragStartHeight.current = el.offsetHeight
     document.body.style.cursor = 'row-resize'
     document.body.style.userSelect = 'none'
-  }, [height])
+  }, [])
+
+  useEffect(() => {
+    const el = containerRef.current
+    if (el) el.style.height = ''
+  }, [editorHeight])
 
   useEffect(() => {
     function onMouseMove(e: MouseEvent) {
       if (!isDragging.current) return
+      const el = containerRef.current
+      if (!el) return
       const delta = e.clientY - dragStartY.current
-      setHeight(Math.max(100, dragStartHeight.current + delta))
+      el.style.height = `${Math.max(100, dragStartHeight.current + delta)}px`
     }
     function onMouseUp() {
       if (!isDragging.current) return
@@ -179,22 +182,16 @@ export default function VimEditor({
     currentStepIdxRef.current = 0
     setHintTier(0)
     setStepIdx(0)
-    setGradeLabel(null)
+    setHasScore(false)
 
-    const finishEditGoal = (idealKs: number, resultType: 'edit' | 'multi' | 'mode') => {
+    const finishEditGoal = (idealKs: number) => {
       if (completedRef.current) return
       completedRef.current = true
       const elapsed = Date.now() - startTimeRef.current
-      const stars = computeStars(
-        totalKeystrokesRef.current,
-        idealKs,
-        elapsed,
-        hintTierRef.current,
-        resetUsedRef.current,
-      )
+      const score = computeScore(totalKeystrokesRef.current, idealKs, elapsed)
       setCompleted(true)
-      setGradeLabel(`${totalKeystrokesRef.current} keys vs ideal ${idealKs}`)
-      onComplete?.({ type: resultType, stars })
+      setHasScore(true)
+      onCompleteRef.current?.(score)
     }
 
     const targetDecoration = (() => {
@@ -238,29 +235,6 @@ export default function VimEditor({
       return [targetHighlight, targetField]
     })()
 
-    const keystrokeTracker = EditorView.domEventHandlers({
-      keydown: (event) => {
-        if (['Shift', 'Control', 'Alt', 'Meta'].includes(event.key)) return false
-
-        if (goal?.type === 'cursor-reach') {
-          if (BLOCKED_NAV_KEYS.has(event.key)) {
-            event.preventDefault()
-            return true
-          }
-          const idx = currentTargetIdxRef.current
-          const allowed = goal.targets[idx]?.allowedKeys
-          if (allowed && !allowed.includes(event.key)) {
-            event.preventDefault()
-            return true
-          }
-          if (!completedRef.current) segmentKeystrokesRef.current++
-        }
-
-        if (!completedRef.current) totalKeystrokesRef.current++
-        return false
-      },
-    })
-
     const modeDisplay = EditorView.updateListener.of((update) => {
       const m = readVimMode(update.view)
       if (m) {
@@ -279,7 +253,7 @@ export default function VimEditor({
               setModeRepsDisplay(modeRepsRef.current)
               if (modeRepsRef.current >= goal.reps) {
                 const idealKs = goal.idealKeystrokes ?? Math.max(1, goal.reps * goal.sequence.length)
-                finishEditGoal(idealKs, 'mode')
+                finishEditGoal(idealKs)
               }
             }
           }
@@ -306,17 +280,11 @@ export default function VimEditor({
 
           if (nextIdx >= goal.targets.length) {
             completedRef.current = true
-            const stars = computeStars(
-              totalActualRef.current,
-              totalIdealRef.current,
-              totalTimeRef.current,
-              hintTierRef.current,
-              resetUsedRef.current,
-            )
+            const score = computeScore(totalActualRef.current, totalIdealRef.current, totalTimeRef.current)
             setCompleted(true)
             setTargetsHit(nextIdx)
-            setGradeLabel(`${totalActualRef.current} keys vs ideal ${totalIdealRef.current}`)
-            onComplete?.({ type: 'navigation', stars })
+            setHasScore(true)
+            onCompleteRef.current?.(score)
           } else {
             currentTargetIdxRef.current = nextIdx
             segmentKeystrokesRef.current = 0
@@ -337,7 +305,7 @@ export default function VimEditor({
         const text = update.view.state.doc.toString()
         if (text === goal.expected) {
           if (goal.requireNormalOnExit && readVimMode(update.view) !== 'NORMAL') return
-          finishEditGoal(goal.idealKeystrokes, 'edit')
+          finishEditGoal(goal.idealKeystrokes)
         }
       }
 
@@ -345,7 +313,7 @@ export default function VimEditor({
         const text = update.view.state.doc.toString()
         if (goal.pattern.test(text)) {
           if (goal.requireNormalOnExit && readVimMode(update.view) !== 'NORMAL') return
-          finishEditGoal(goal.idealKeystrokes, 'edit')
+          finishEditGoal(goal.idealKeystrokes)
         }
       }
 
@@ -370,7 +338,7 @@ export default function VimEditor({
           const nextIdx = idx + 1
           if (nextIdx >= goal.steps.length) {
             const idealKs = goal.steps.reduce((sum, s) => sum + (s.idealKeystrokes ?? 0), 0) || 1
-            finishEditGoal(idealKs, 'multi')
+            finishEditGoal(idealKs)
           } else {
             currentStepIdxRef.current = nextIdx
             setStepIdx(nextIdx)
@@ -382,24 +350,24 @@ export default function VimEditor({
     const isDark = theme === 'dark'
 
     const lightTheme = EditorView.theme({
-      '&': { fontSize: `${fontSize}px`, fontFamily: 'var(--font-mono), "JetBrains Mono", monospace', backgroundColor: '#ffffff' },
+      '&': { fontSize: `${fontSize}px`, fontFamily: 'var(--font-mono), "JetBrains Mono", monospace', backgroundColor: 'transparent' },
       '.cm-content': { padding: '16px 0' },
       '.cm-line': { padding: '0 16px', lineHeight: '1.7', color: '#1a1e2e' },
-      '.cm-gutters': { backgroundColor: '#f0f2f8', borderRight: '1px solid #cdd4ea', color: '#a8b2d0' },
-      '.cm-activeLineGutter': { backgroundColor: '#dde2f0' },
-      '.cm-activeLine': { backgroundColor: '#dde2f0' },
+      '.cm-gutters': { backgroundColor: 'transparent', borderRight: '1px solid #cdd4ea', color: '#a8b2d0' },
+      '.cm-activeLineGutter': { backgroundColor: 'rgba(200, 210, 230, 0.45)' },
+      '.cm-activeLine': { backgroundColor: 'rgba(200, 210, 230, 0.45)' },
       '.cm-cursor': { borderLeftColor: '#0d9b84', borderLeftWidth: '2px' },
       '.cm-focused': { outline: 'none' },
       '.cm-selectionBackground': { backgroundColor: '#cdd4ea !important' },
     })
 
     const darkTheme = EditorView.theme({
-      '&': { fontSize: `${fontSize}px`, fontFamily: 'var(--font-mono), "JetBrains Mono", monospace', backgroundColor: '#1a1e2e' },
+      '&': { fontSize: `${fontSize}px`, fontFamily: 'var(--font-mono), "JetBrains Mono", monospace', backgroundColor: 'transparent' },
       '.cm-content': { padding: '16px 0' },
       '.cm-line': { padding: '0 16px', lineHeight: '1.7' },
-      '.cm-gutters': { backgroundColor: '#161a28', borderRight: '1px solid #2e3450' },
-      '.cm-activeLineGutter': { backgroundColor: '#1e2436' },
-      '.cm-activeLine': { backgroundColor: '#1e2436' },
+      '.cm-gutters': { backgroundColor: 'transparent', borderRight: '1px solid #2e3450' },
+      '.cm-activeLineGutter': { backgroundColor: 'rgba(255, 255, 255, 0.025)' },
+      '.cm-activeLine': { backgroundColor: 'rgba(255, 255, 255, 0.025)' },
       '.cm-cursor': { borderLeftColor: '#4ec9b0', borderLeftWidth: '2px' },
       '.cm-focused': { outline: 'none' },
     })
@@ -417,10 +385,9 @@ export default function VimEditor({
         history(),
         ...(showLineNumbers ? [lineNumbers()] : []),
         highlightActiveLine(),
-        ...(isDark ? [oneDark, darkTheme] : [lightTheme]),
+        ...(isDark ? [syntaxHighlighting(oneDarkHighlightStyle), darkTheme] : [lightTheme]),
         keymap.of([...defaultKeymap, ...historyKeymap]),
         modeDisplay,
-        keystrokeTracker,
         blockMouse,
         ...targetDecoration,
       ],
@@ -430,11 +397,49 @@ export default function VimEditor({
     viewRef.current = view
     view.focus()
 
+    const cm = getCM(view)
+    const originalHandleKey = Vim.handleKey
+    Vim.handleKey = function (targetCm: any, key: string, origin: string) {
+      if (targetCm === cm) {
+        if (goal?.type === 'cursor-reach' && !completedRef.current) {
+          if (BLOCKED_VIM_NAV_KEYS.has(key)) {
+            flashContainer('Use h j k l instead')
+            return true
+          }
+          const idx = currentTargetIdxRef.current
+          const allowed = goal.targets[idx]?.allowedKeys
+          if (allowed && !allowed.includes(key)) {
+            flashContainer(`Only ${allowed.join(' ')} allowed here`)
+            return true
+          }
+          segmentKeystrokesRef.current++
+        }
+        if (!completedRef.current) {
+          totalKeystrokesRef.current++
+        }
+      }
+      return originalHandleKey.call(this, targetCm, key, origin)
+    }
+
+    function flashContainer(msg: string) {
+      const el = containerRef.current
+      if (!el) return
+      el.classList.remove('cm-flash-blocked')
+      void el.offsetWidth
+      el.classList.add('cm-flash-blocked')
+
+      if (blockedTimerRef.current) clearTimeout(blockedTimerRef.current)
+      setBlockedMsg(msg)
+      blockedTimerRef.current = setTimeout(() => setBlockedMsg(null), 2000)
+    }
+
     return () => {
+      Vim.handleKey = originalHandleKey
+      if (blockedTimerRef.current) clearTimeout(blockedTimerRef.current)
       view.destroy()
       viewRef.current = null
     }
-  }, [initialText, theme, fontSize, showLineNumbers, goal, onComplete])
+  }, [initialText, theme, fontSize, showLineNumbers, goal])
 
   function handleReset() {
     if (!viewRef.current) return
@@ -445,7 +450,7 @@ export default function VimEditor({
 
     completedRef.current = false
     setCompleted(false)
-    setGradeLabel(null)
+    setHasScore(false)
     modeHistoryRef.current = []
     resetUsedRef.current = true
     totalKeystrokesRef.current = 0
@@ -505,7 +510,7 @@ export default function VimEditor({
     if (!completedRef.current) {
       completedRef.current = true
       setCompleted(true)
-      onComplete?.({ type: 'manual' })
+      onCompleteRef.current?.(null)
     }
   }
 
@@ -533,7 +538,8 @@ export default function VimEditor({
         </p>
       </div>
 
-      <div className="rounded-lg overflow-hidden border border-[var(--border)]">
+      <div className="relative rounded-lg overflow-hidden border border-[var(--border)]">
+      {overlay}
       {/* Title bar */}
       <div className="flex items-center gap-2 px-4 py-2.5 bg-[var(--bg-surface)] border-b border-[var(--border)]">
         <span className="size-2.5 rounded-full bg-[var(--tn-red)] opacity-70" />
@@ -543,7 +549,7 @@ export default function VimEditor({
         <span className="w-[52px]" />
       </div>
 
-      <div ref={containerRef} style={{ height: `${height}px`, overflow: 'auto' }} />
+      <div ref={containerRef} className="cm-editor-container" data-editor-size={editorHeight} />
 
       <div
         onMouseDown={onDragMouseDown}
@@ -581,14 +587,19 @@ export default function VimEditor({
               {currentStepLabel ? ` — ${currentStepLabel}` : ''}
             </span>
           )}
+          {blockedMsg && !completed && (
+            <span className="font-mono text-xs text-[var(--tn-red)]">
+              {blockedMsg}
+            </span>
+          )}
           {completed && (
-            <span className="font-mono text-xs text-yellow-400 font-semibold">
-              ✓ complete{gradeLabel ? ` · ${gradeLabel}` : ''}
+            <span className="font-mono text-xs font-semibold text-[var(--tn-green)]">
+              ✓ Completed
             </span>
           )}
         </div>
         <div className="flex gap-2">
-          {hintButtonLabel && (
+          {hintButtonLabel && !completed && (
             <button
               onClick={handleShowHint}
               className="font-mono text-xs px-2 py-1 rounded border border-[var(--border)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:border-[var(--text-secondary)] transition-colors"
@@ -602,6 +613,14 @@ export default function VimEditor({
               className="font-mono text-xs px-2 py-1 rounded border border-[var(--border)] text-[var(--accent)] hover:bg-[var(--accent)] hover:text-[var(--accent-text)] transition-colors"
             >
               mark done
+            </button>
+          )}
+          {completed && hasScore && (
+            <button
+              onClick={() => onViewResults?.()}
+              className="font-mono text-xs px-2 py-1 rounded border border-[var(--border)] text-[var(--accent)] hover:bg-[var(--accent)] hover:text-[var(--accent-text)] transition-colors"
+            >
+              view results
             </button>
           )}
           <button

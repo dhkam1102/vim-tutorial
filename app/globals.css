@@ -42,6 +42,9 @@
   --tn-red:         #f7768e;
   --tn-orange:      #ff9e64;
   --tn-purple:      #bb9af7;
+
+  --editor-bg:      #1a1e2e;
+  --editor-bg-tint: #2c2536;
 }
 
 [data-theme="light"] {
@@ -75,6 +78,9 @@
   --target-highlight:      #7c3aed;
   --target-highlight-glow: rgba(124, 58, 237, 0.10);
   --target-highlight-bg:   rgba(124, 58, 237, 0.05);
+
+  --editor-bg:      #ffffff;
+  --editor-bg-tint: #fef4f6;
 }
 
 /* ─── Base ──────────────────────────────────────────────────────────── */
@@ -213,6 +219,32 @@ body {
   animation: cursor-blink 0.8s step-end infinite;
 }
 
+/* ─── Editor container ─────────────────────────────────────────────── */
+.cm-editor-container {
+  background-color: var(--editor-bg);
+  overflow: auto;
+}
+.cm-editor-container[data-editor-size="sm"] { height: 320px; }
+.cm-editor-container[data-editor-size="md"] { height: 480px; }
+.cm-editor-container[data-editor-size="lg"] { height: 600px; }
+
+/* ─── Blocked key visual bell ──────────────────────────────────────── */
+@keyframes blocked-shake {
+  0%   { transform: translateX(0); }
+  20%  { transform: translateX(-3px); }
+  40%  { transform: translateX(3px); }
+  60%  { transform: translateX(-2px); }
+  80%  { transform: translateX(1px); }
+  100% { transform: translateX(0); }
+}
+@keyframes blocked-tint {
+  0%   { background-color: var(--editor-bg-tint); }
+  100% { background-color: var(--editor-bg); }
+}
+.cm-flash-blocked {
+  animation: blocked-shake 0.25s ease-out, blocked-tint 0.4s ease-out;
+}
+
 /* ─── CodeMirror scrollbar ──────────────────────────────────────────── */
 .cm-scroller::-webkit-scrollbar {
   width: 6px;
@@ -241,6 +273,9 @@ body {
   .crt-cursor::after,
   .demo-cursor {
     animation: none;
+  }
+  .cm-flash-blocked {
+    animation: blocked-tint 0.4s ease-out !important;
   }
   .progress-fill {
     transition: none;

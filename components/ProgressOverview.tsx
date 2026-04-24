@@ -5,10 +5,9 @@ import { curriculum } from '@/data/curriculum'
 import { useProgress } from '@/context/ProgressContext'
 
 function SectionTrack({ section }: { section: typeof curriculum[0] }) {
-  const { getStars } = useProgress()
+  const { isCompleted } = useProgress()
   const total = section.lessons.length
-  const completed = section.lessons.filter((l) => getStars(section.id, l.id) !== null).length
-  const threeStars = section.lessons.filter((l) => getStars(section.id, l.id) === 3).length
+  const completed = section.lessons.filter((l) => isCompleted(section.id, l.id)).length
   const pct = total > 0 ? completed / total : 0
   const isComplete = completed === total && total > 0
 
@@ -24,15 +23,10 @@ function SectionTrack({ section }: { section: typeof curriculum[0] }) {
         </span>
         <span className="font-mono text-xs text-[var(--text-secondary)] shrink-0 tabular-nums">
           {completed}/{total}
-          {threeStars > 0 && (
-            <span className="ml-1.5 star-filled text-xs" aria-hidden="true">
-              {'★'.repeat(Math.min(threeStars, 3))}
-            </span>
-          )}
         </span>
       </div>
 
-      {/* Track bar — scaleX driven by CSS var */}
+      {/* Track bar */}
       <div className="progress-track mb-2.5" role="progressbar" aria-valuenow={completed} aria-valuemin={0} aria-valuemax={total} aria-label={`${section.title} progress`}>
         <div
           className={`progress-fill ${isComplete ? 'progress-fill-complete' : ''}`}
@@ -43,21 +37,15 @@ function SectionTrack({ section }: { section: typeof curriculum[0] }) {
       {/* Lesson dots */}
       <div className="flex flex-wrap gap-1">
         {section.lessons.map((lesson) => {
-          const stars = getStars(section.id, lesson.id)
+          const done = isCompleted(section.id, lesson.id)
           const href = `/lessons/${section.id}/${lesson.id}`
           return (
             <Link
               key={lesson.id}
               href={href}
-              aria-label={`${lesson.title}${stars !== null ? `, ${stars} stars` : ', not started'}`}
+              aria-label={`${lesson.title}${done ? ', completed' : ', not started'}`}
               className={`size-2 rounded-sm transition-transform hover:scale-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] ${
-                stars === 3
-                  ? 'bg-[var(--accent)]'
-                  : stars === 2
-                  ? 'bg-[var(--accent-dim)]'
-                  : stars === 1
-                  ? 'bg-[var(--border-subtle)]'
-                  : 'bg-[var(--border)]'
+                done ? 'bg-[var(--accent)]' : 'bg-[var(--border)]'
               }`}
             />
           )

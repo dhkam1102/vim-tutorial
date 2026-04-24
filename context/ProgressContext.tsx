@@ -4,27 +4,18 @@ import { createContext, useContext, useEffect, useState, startTransition } from 
 import { useSession } from 'next-auth/react'
 
 type LessonProgress = {
-  stars: 1 | 2 | 3
   completedAt: string
-  hintsUsed: boolean
-  resetsUsed: boolean
 }
 
 type ProgressMap = Record<string, LessonProgress>
 
 type ProgressContextType = {
   progress: ProgressMap
-  recordCompletion: (sectionId: string, lessonId: string, stars: 1 | 2 | 3) => void
-  getStars: (sectionId: string, lessonId: string) => 1 | 2 | 3 | null
+  recordCompletion: (sectionId: string, lessonId: string) => void
+  isCompleted: (sectionId: string, lessonId: string) => boolean
 }
 
 const ProgressContext = createContext<ProgressContextType | null>(null)
-
-function calcStars(hintsUsed: boolean, resetsUsed: boolean): 1 | 2 | 3 {
-  if (hintsUsed) return 1
-  if (resetsUsed) return 2
-  return 3
-}
 
 const STORAGE_KEY = 'vim-progress'
 
@@ -46,14 +37,12 @@ export function ProgressProvider({ children }: { children: React.ReactNode }) {
     if (!session?.user?.id) return
     fetch('/api/progress')
       .then((r) => r.json())
-      .then((serverData: ProgressMap) => {
+      .then((serverData: Record<string, unknown>) => {
         setProgress((local) => {
           const merged = { ...local }
           for (const key of Object.keys(serverData)) {
-            const srv = serverData[key]
-            const loc = local[key]
-            if (!loc || srv.stars > loc.stars) {
-              merged[key] = srv
+            if (!merged[key]) {
+              merged[key] = { completedAt: new Date().toISOString() }
             }
           }
           localStorage.setItem(STORAGE_KEY, JSON.stringify(merged))
@@ -63,19 +52,13 @@ export function ProgressProvider({ children }: { children: React.ReactNode }) {
       .catch(() => {})
   }, [session?.user?.id])
 
-  function recordCompletion(sectionId: string, lessonId: string, stars: 1 | 2 | 3) {
+  function recordCompletion(sectionId: string, lessonId: string) {
     const key = `${sectionId}::${lessonId}`
 
     setProgress((prev) => {
-      const existing = prev[key]
-      if (existing && existing.stars >= stars) return prev
+      if (prev[key]) return prev
 
-      const entry: LessonProgress = {
-        stars,
-        completedAt: new Date().toISOString(),
-        hintsUsed: false,
-        resetsUsed: false,
-      }
+      const entry: LessonProgress = { completedAt: new Date().toISOString() }
       const next = { ...prev, [key]: entry }
       localStorage.setItem(STORAGE_KEY, JSON.stringify(next))
 
@@ -83,7 +66,7 @@ export function ProgressProvider({ children }: { children: React.ReactNode }) {
         fetch('/api/progress', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ sectionId, lessonId, stars, hintsUsed: false, resetsUsed: false }),
+          body: JSON.stringify({ sectionId, lessonId, stars: 1, hintsUsed: false, resetsUsed: false }),
         }).catch(() => {})
       }
 
@@ -91,13 +74,12 @@ export function ProgressProvider({ children }: { children: React.ReactNode }) {
     })
   }
 
-  function getStars(sectionId: string, lessonId: string): 1 | 2 | 3 | null {
-    const entry = progress[`${sectionId}::${lessonId}`]
-    return entry ? entry.stars : null
+  function isCompleted(sectionId: string, lessonId: string): boolean {
+    return !!progress[`${sectionId}::${lessonId}`]
   }
 
   return (
-    <ProgressContext.Provider value={{ progress, recordCompletion, getStars }}>
+    <ProgressContext.Provider value={{ progress, recordCompletion, isCompleted }}>
       {children}
     </ProgressContext.Provider>
   )

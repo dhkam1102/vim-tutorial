@@ -4,7 +4,8 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { Lesson, Section } from '@/data/curriculum'
 import KeyBadge from './KeyBadge'
-import VimEditor, { type ExerciseResult } from './VimEditor'
+import VimEditor, { type ExerciseScore } from './VimEditor'
+import ExerciseCompleteModal from './ExerciseCompleteModal'
 import DemoPlayer from './DemoPlayer'
 import { useProgress } from '@/context/ProgressContext'
 
@@ -41,40 +42,28 @@ function renderDescription(text: string) {
   ))
 }
 
-function StarRating({ stars }: { stars: 1 | 2 | 3 | null }) {
-  if (stars === null) return null
-  return (
-    <span className="inline-flex gap-0.5" aria-label={`${stars} out of 3 stars`}>
-      {[1, 2, 3].map((i) => (
-        <span
-          key={i}
-          className={`text-xl star-pop ${i <= stars ? 'star-filled' : 'star-empty'}`}
-          style={{ animationDelay: `${(i - 1) * 0.08}s` }}
-        >
-          ★
-        </span>
-      ))}
-    </span>
-  )
-}
-
 export default function LessonContent({ section, lesson, prev, next }: Props) {
   const [hintsUsed, setHintsUsed] = useState(false)
   const [resetsUsed, setResetsUsed] = useState(false)
-  const { recordCompletion, getStars } = useProgress()
+  const [lastScore, setLastScore] = useState<ExerciseScore | null>(null)
+  const [showModal, setShowModal] = useState(false)
+  const [editorKey, setEditorKey] = useState(0)
+  const { recordCompletion, isCompleted } = useProgress()
 
-  const stars = getStars(section.id, lesson.id)
+  const completed = isCompleted(section.id, lesson.id)
 
-  function handleComplete(result: ExerciseResult) {
-    let earned: 1 | 2 | 3
-    if (result.type === 'manual') {
-      if (hintsUsed) earned = 1
-      else if (resetsUsed) earned = 2
-      else earned = 3
-    } else {
-      earned = result.stars
+  function handleComplete(score: ExerciseScore | null) {
+    recordCompletion(section.id, lesson.id)
+    setLastScore(score)
+    if (score) {
+      setTimeout(() => setShowModal(true), 600)
     }
-    recordCompletion(section.id, lesson.id, earned)
+  }
+
+  function handleRetry() {
+    setShowModal(false)
+    setLastScore(null)
+    setEditorKey((k) => k + 1)
   }
 
   return (
@@ -90,7 +79,7 @@ export default function LessonContent({ section, lesson, prev, next }: Props) {
           {lesson.title}
         </h1>
         <div className="flex items-center gap-3 shrink-0 pt-1">
-          {stars !== null && <StarRating stars={stars} />}
+          {completed && <span className="font-mono text-sm font-semibold text-[var(--tn-green)]">✓ Completed</span>}
           <div className="flex gap-1.5">
             {lesson.keys.map((k, i) => (
               <KeyBadge key={i} keyName={k} large />
@@ -110,13 +99,25 @@ export default function LessonContent({ section, lesson, prev, next }: Props) {
       {/* Practice editor */}
       <div className="mb-10">
         <VimEditor
-          key={section.id + lesson.id}
+          key={`${section.id}-${lesson.id}-${editorKey}`}
           initialText={lesson.exercise.initialText}
           instructions={lesson.exercise.instructions}
           hint={lesson.exercise.hint}
           hints={lesson.exercise.hints}
           goal={lesson.exercise.goal}
+          overlay={
+            showModal && lastScore ? (
+              <ExerciseCompleteModal
+                score={lastScore}
+                onClose={() => setShowModal(false)}
+                onRetry={handleRetry}
+                nextHref={next ? `/lessons/${next.sectionId}/${next.lessonId}` : null}
+                nextTitle={next?.title ?? null}
+              />
+            ) : undefined
+          }
           onComplete={handleComplete}
+          onViewResults={() => setShowModal(true)}
           onHintUsed={() => setHintsUsed(true)}
           onReset={() => setResetsUsed(true)}
         />

@@ -26,7 +26,7 @@ const PreferencesContext = createContext<PreferencesContextType>({
   setLineNumbers: () => {},
 })
 
-const EDITOR_HEIGHT_MAP: Record<EditorHeight, number> = { sm: 200, md: 320, lg: 480 }
+const EDITOR_HEIGHT_MAP: Record<EditorHeight, number> = { sm: 320, md: 480, lg: 600 }
 
 export function PreferencesProvider({ children }: { children: React.ReactNode }) {
   const [editorHeight, setEditorHeightState] = useState<EditorHeight>('md')
