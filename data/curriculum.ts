@@ -59,7 +59,7 @@ export type Section = {
 export const curriculum: Section[] = [
   {
     id: 'basic-vim',
-    title: 'Modes',
+    title: 'Basics',
     lessons: [
       {
         id: 'intro-to-modes',
@@ -104,6 +104,26 @@ export const curriculum: Section[] = [
           instructions: '1. Press i to enter Insert mode.\n2. Add a word anywhere.\n3. Press Esc to return to Normal mode.',
           hint: 'i enters Insert mode. Esc exits back to Normal mode.',
           goal: { type: 'mode-sequence', sequence: ['INSERT', 'NORMAL'], reps: 1 },
+        },
+      },
+      {
+        id: 'insert-mode',
+        title: 'Insert Mode',
+        keys: ['i', 'a', 'esc'],
+        description:
+          '**i** and **a** both enter Insert mode, just from different positions.\n\n**i** inserts before the cursor.\n**a** inserts after the cursor.\n**Esc** always returns you to Normal mode.\nMost vim work follows the same loop: navigate in Normal, edit in Insert, Esc back.',
+        demo: [
+          { mode: 'NORMAL', text: 'name = ""\nrole = ""', cursor: [0, 7], description: 'Cursor inside the empty string.' },
+          { key: 'i', mode: 'INSERT', text: 'name = ""\nrole = ""', cursor: [0, 7], description: 'i enters Insert mode before the cursor.' },
+          { key: 'type', mode: 'INSERT', text: 'name = "Alice"\nrole = ""', cursor: [0, 12], description: 'Type the value.' },
+          { key: 'Esc', mode: 'NORMAL', text: 'name = "Alice"\nrole = ""', cursor: [0, 11], description: 'Esc returns to Normal mode.' },
+        ],
+        exercise: {
+          initialText: `print("Hello, !")
+name = ""`,
+          instructions: 'Use i or a to insert "World" after the comma on line 1, and your name on line 2.',
+          hint: 'Move to the ! on line 1, press i, type "World", press Esc.',
+          goal: { type: 'mode-sequence', sequence: ['INSERT', 'NORMAL'], reps: 2 },
         },
       },
       {
@@ -168,26 +188,6 @@ message = greeting + str(count)`,
             { target: [0, 11], idealKeystrokes: 1 },
             { target: [0, 9], idealKeystrokes: 1 },
           ] },
-        },
-      },
-      {
-        id: 'insert-mode',
-        title: 'Insert Mode',
-        keys: ['i', 'a', 'esc'],
-        description:
-          '**i** and **a** both enter Insert mode, just from different positions.\n\n**i** inserts before the cursor.\n**a** inserts after the cursor.\n**Esc** always returns you to Normal mode.\nMost vim work follows the same loop: navigate in Normal, edit in Insert, Esc back.',
-        demo: [
-          { mode: 'NORMAL', text: 'name = ""\nrole = ""', cursor: [0, 7], description: 'Cursor inside the empty string.' },
-          { key: 'i', mode: 'INSERT', text: 'name = ""\nrole = ""', cursor: [0, 7], description: 'i enters Insert mode before the cursor.' },
-          { key: 'type', mode: 'INSERT', text: 'name = "Alice"\nrole = ""', cursor: [0, 12], description: 'Type the value.' },
-          { key: 'Esc', mode: 'NORMAL', text: 'name = "Alice"\nrole = ""', cursor: [0, 11], description: 'Esc returns to Normal mode.' },
-        ],
-        exercise: {
-          initialText: `print("Hello, !")
-name = ""`,
-          instructions: 'Use i or a to insert "World" after the comma on line 1, and your name on line 2.',
-          hint: 'Move to the ! on line 1, press i, type "World", press Esc.',
-          goal: { type: 'mode-sequence', sequence: ['INSERT', 'NORMAL'], reps: 2 },
         },
       },
     ],
@@ -383,7 +383,7 @@ response = requests.get(url).json()`,
   },
   {
     id: 'basic-operators',
-    title: 'Deleting and Changing',
+    title: 'Core Editing',
     lessons: [
       {
         id: 'intro-to-operators',
@@ -514,7 +514,7 @@ total = x + w  # keep`,
   },
   {
     id: 'advanced-vertical-movement',
-    title: 'Line Navigation',
+    title: 'Line Control',
     lessons: [
       {
         id: 'relative-line-jumps',
@@ -648,7 +648,7 @@ def teardown():
   },
   {
     id: 'search',
-    title: 'Searching',
+    title: 'Search',
     lessons: [
       {
         id: 'search',
@@ -1202,7 +1202,7 @@ def footer():
   },
   {
     id: 'visual-mode',
-    title: 'Selecting Text',
+    title: 'Visual Mode',
     lessons: [
       {
         id: 'intro-to-visual-mode',
