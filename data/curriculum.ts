@@ -101,7 +101,7 @@ export const curriculum: Section[] = [
 # This is Normal mode — you cannot type here yet.
 # Press i to enter Insert mode, then type something.
 # Press Esc to return to Normal mode.`,
-          instructions: 'Press i to enter Insert mode, add a word anywhere, then press Esc to return to Normal mode.',
+          instructions: '1. Press i to enter Insert mode.\n2. Add a word anywhere.\n3. Press Esc to return to Normal mode.',
           hint: 'i enters Insert mode. Esc exits back to Normal mode.',
           goal: { type: 'mode-sequence', sequence: ['INSERT', 'NORMAL'], reps: 1 },
         },
@@ -156,7 +156,7 @@ active = True`,
           initialText: `greeting = "Hello, World!"
 count = 42
 message = greeting + str(count)`,
-          instructions: 'Starting at the beginning, use w to jump forward word by word to reach "World". Then use b to go back to "Hello".',
+          instructions: '1. Use w to jump forward word by word to reach "World".\n2. Use b to go back to "Hello".',
           hint: 'w moves forward one word at a time. b moves backward.',
           goal: { type: 'cursor-reach', targets: [
             { target: [0, 9], idealKeystrokes: 1 },
@@ -204,9 +204,9 @@ name = ""`,
           '**I** and **A** jump to specific positions on the line before entering Insert mode.\n\n**I** goes to the first non-blank character on the line.\n**A** goes to the end of the line.\nNo need to press Home or End manually.',
         demo: [
           { mode: 'NORMAL', text: 'def greet():\n    print("Hello")\n    return "done"', cursor: [1, 0], description: 'Cursor at start of line 2.' },
-          { key: 'A', mode: 'INSERT', text: 'def greet():\n    print("Hello")\n    return "done"', cursor: [1, 18], description: 'A jumps to end of line, enters EDIT.' },
+          { key: 'A', mode: 'INSERT', text: 'def greet():\n    print("Hello")\n    return "done"', cursor: [1, 18], description: 'A jumps to end of line, enters Insert mode.' },
           { key: 'type', mode: 'INSERT', text: 'def greet():\n    print("Hello")  # log\n    return "done"', cursor: [1, 24], description: 'Type at end of line.' },
-          { key: 'Esc', mode: 'NORMAL', text: 'def greet():\n    print("Hello")  # log\n    return "done"', cursor: [1, 23], description: 'Back to NAV.' },
+          { key: 'Esc', mode: 'NORMAL', text: 'def greet():\n    print("Hello")  # log\n    return "done"', cursor: [1, 23], description: 'Back to Normal mode.' },
         ],
         exercise: {
           initialText: `def greet():
@@ -225,14 +225,14 @@ name = ""`,
           '**o** and **O** open a new line and drop you straight into Insert mode.\n\n**o** opens a line below the current one.\n**O** opens a line above.\nNo need to go to the end of the line and press Enter.',
         demo: [
           { mode: 'NORMAL', text: 'x = 1\nz = 3', cursor: [0, 0], description: 'Two lines (line 2 is missing).' },
-          { key: 'o', mode: 'INSERT', text: 'x = 1\n\nz = 3', cursor: [1, 0], description: 'o opens a new line below, enters EDIT.' },
+          { key: 'o', mode: 'INSERT', text: 'x = 1\n\nz = 3', cursor: [1, 0], description: 'o opens a new line below, enters Insert mode.' },
           { key: 'type', mode: 'INSERT', text: 'x = 1\ny = 2\nz = 3', cursor: [1, 5], description: 'Type the missing line.' },
-          { key: 'Esc', mode: 'NORMAL', text: 'x = 1\ny = 2\nz = 3', cursor: [1, 4], description: 'Back to NAV.' },
+          { key: 'Esc', mode: 'NORMAL', text: 'x = 1\ny = 2\nz = 3', cursor: [1, 4], description: 'Back to Normal mode.' },
         ],
         exercise: {
           initialText: `x = 1
 z = 3`,
-          instructions: 'With your cursor on line 1 (x = 1), press o to open a new line below and type y = 2. Press Esc.',
+          instructions: '1. With your cursor on line 1 (x = 1), press o to open a new line below.\n2. Type y = 2.\n3. Press Esc.',
           hint: 'Press o on line 1, type y = 2, then Esc.',
           goal: { type: 'mode-sequence', sequence: ['INSERT', 'NORMAL'], reps: 3 },
         },
@@ -246,13 +246,13 @@ z = 3`,
         demo: [
           { mode: 'NORMAL', text: 'primt("Hello")\nmesage = "World"', cursor: [0, 4], description: 'Cursor on the typo t in primt.' },
           { key: 'r', mode: 'NORMAL', text: 'primt("Hello")\nmesage = "World"', cursor: [0, 4], description: 'r waits for a replacement char.' },
-          { key: 'n', mode: 'NORMAL', text: 'print("Hello")\nmesage = "World"', cursor: [0, 4], description: 'Typed n, fixed in place, still NAV.' },
+          { key: 'n', mode: 'NORMAL', text: 'print("Hello")\nmesage = "World"', cursor: [0, 4], description: 'Typed n, fixed in place, still in Normal mode.' },
           { key: 'x', mode: 'NORMAL', text: 'print("Hello")\nmsage = "World"', cursor: [1, 1], description: 'x deletes the char under cursor.' },
         ],
         exercise: {
           initialText: `mesage = "Hellp, World!"
 primt(mesage)`,
-          instructions: 'Fix the typos: "Hellp" → "Hello" (use r), "mesage" → "message" (insert s with i or s), "primt" → "print" (swap m for n with r).',
+          instructions: 'Fix the typos:\n\n- "Hellp" → "Hello" (use r)\n- "mesage" → "message" (insert s with i or s)\n- "primt" → "print" (swap m for n with r)',
           hint: 'Move to p in "Hellp", press r then o. Between m and e in "mesage", press i then type s. On m in "primt", press r then n.',
           goal: { type: 'manual' },
         },
@@ -308,7 +308,7 @@ response = requests.get(url).json()`,
           initialText: `    x = 10
     y = 20
     z = x + y`,
-          instructions: 'On line 1, press $ to go to the end, then 0 to go to column 0, then _ to jump back to x (the first non-blank character).',
+          instructions: 'On line 1:\n\n1. Press $ to go to the end.\n2. Press 0 to go to column 0.\n3. Press _ to jump back to x (the first non-blank character).',
           hint: '$ = end of line, 0 = column 0, _ = first non-blank char',
           goal: { type: 'cursor-reach', targets: [
             { target: [0, 9], idealKeystrokes: 1 },
@@ -337,7 +337,7 @@ response = requests.get(url).json()`,
         exercise: {
           initialText: `def calculate_total(price, tax, discount):
     return price + tax - discount`,
-          instructions: 'On line 1, press f( to jump to the opening parenthesis. Then press ; to jump to the next comma.',
+          instructions: '1. On line 1, press f( to jump to the opening parenthesis.\n2. Press ; to jump to the next comma.',
           hint: 'f( jumps to (, then ; repeats to find the next match.',
           goal: { type: 'cursor-reach', targets: [
             { target: [0, 4], idealKeystrokes: 1 },
@@ -394,7 +394,7 @@ response = requests.get(url).json()`,
         demo: [
           { mode: 'NORMAL', text: 'delete this word now\nchange this value\nyank this line', cursor: [0, 7], description: 'Cursor on "this".' },
           { key: 'dw', mode: 'NORMAL', text: 'delete word now\nchange this value\nyank this line', cursor: [0, 7], description: 'd + w = delete word.' },
-          { key: 'cw', mode: 'INSERT', text: 'delete word now\nchange  value\nyank this line', cursor: [1, 7], description: 'c + w = change word (enters EDIT).' },
+          { key: 'cw', mode: 'INSERT', text: 'delete word now\nchange  value\nyank this line', cursor: [1, 7], description: 'c + w = change word (enters Insert mode).' },
           { key: 'yy', mode: 'NORMAL', text: 'delete word now\nchange  value\nyank this line', cursor: [2, 0], description: 'yy = yank (copy) the whole line.' },
         ],
         exercise: {
@@ -420,7 +420,7 @@ yank this line`,
         exercise: {
           initialText: `Remove the extra extra word from this line.
 Also delete these three unnecessary filler words here.`,
-          instructions: 'On line 1, delete the duplicate "extra" using dw. On line 2, delete "unnecessary filler words" (try 3dw or d3w).',
+          instructions: 'On line 1, delete the duplicate "extra" using dw.\n\nOn line 2, delete "unnecessary filler words" (try 3dw or d3w).',
           hint: 'Position on first "extra", press dw. Then find "unnecessary", press 3dw.',
           goal: { type: 'manual' },
         },
@@ -433,14 +433,14 @@ Also delete these three unnecessary filler words here.`,
           '**cw** is like **dw** but drops you into Insert mode after.\n\n**cw** deletes the word and enters Insert mode so you can type a replacement.\n**ce** changes to the end of the word.\n**cW** changes the whole WORD.\n\nQuirk: **cw** behaves like **ce**: it stops at the end of the word, not at the start of the next one, so it doesn\'t eat the trailing space.',
         demo: [
           { mode: 'NORMAL', text: 'foo = "bar"\nbaz = 100', cursor: [0, 0], description: 'Cursor on foo.' },
-          { key: 'cw', mode: 'INSERT', text: ' = "bar"\nbaz = 100', cursor: [0, 0], description: 'cw deletes word, enters EDIT.' },
+          { key: 'cw', mode: 'INSERT', text: ' = "bar"\nbaz = 100', cursor: [0, 0], description: 'cw deletes word, enters Insert mode.' },
           { key: 'type', mode: 'INSERT', text: 'message = "bar"\nbaz = 100', cursor: [0, 7], description: 'Type the replacement.' },
-          { key: 'Esc', mode: 'NORMAL', text: 'message = "bar"\nbaz = 100', cursor: [0, 6], description: 'Done. Back to NAV.' },
+          { key: 'Esc', mode: 'NORMAL', text: 'message = "bar"\nbaz = 100', cursor: [0, 6], description: 'Done. Back to Normal mode.' },
         ],
         exercise: {
           initialText: `foo = "bar"
 baz = 100`,
-          instructions: 'Change "foo" to "message" using cw. Change "baz" to "count" using cw.',
+          instructions: 'Change "foo" to "message" using cw.\n\nChange "baz" to "count" using cw.',
           hint: 'Move to "foo", press cw, type "message", Esc. Repeat for "baz".',
           goal: { type: 'manual' },
         },
@@ -505,7 +505,7 @@ total = x + w  # keep`,
 # paste the PI line below here
 
 # paste it above this comment`,
-          instructions: 'Yank the PI line with yy, then paste it below the first comment with p, and above the second comment with P.',
+          instructions: '1. Yank the PI line with yy.\n2. Paste it below the first comment with p.\n3. Paste it above the second comment with P.',
           hint: 'Move to the PI line, press yy, move to comment line, press p for below or P for above.',
           goal: { type: 'manual' },
         },
@@ -538,7 +538,7 @@ language = "Python"
 version = 3
 debug = False
 verbose = True`,
-          instructions: 'From line 1, jump to line 7 with 6j. Then jump back to line 3 with 4k.',
+          instructions: '1. From line 1, jump to line 7 with 6j.\n2. Then jump back to line 3 with 4k.',
           hint: '6j jumps 6 lines down, 4k jumps 4 lines up.',
           goal: { type: 'cursor-reach', targets: [
             { target: [6, 0], idealKeystrokes: 2 },
@@ -575,7 +575,7 @@ import logging
 from datetime import datetime
 import argparse
 import subprocess  # bottom of file`,
-          instructions: 'Press G to jump to the last line. Then press gg to return to the top. Then press 5G to jump to line 5.',
+          instructions: '1. Press G to jump to the last line.\n2. Press gg to return to the top.\n3. Press 5G to jump to line 5.',
           hint: 'G = last line, gg = first line, 5G = line 5.',
           goal: { type: 'cursor-reach', targets: [
             { target: [9, 0], idealKeystrokes: 1 },
@@ -612,7 +612,7 @@ def process(data):
 
 def teardown():
     cleanup()`,
-          instructions: 'Press } to jump between paragraphs (blank lines). Press { to go back up.',
+          instructions: 'Press } to jump between paragraphs (blank lines).\n\nPress { to go back up.',
           hint: '} moves to next blank line, { moves to previous blank line.',
           goal: { type: 'cursor-reach', targets: [
             { target: [3, 0], idealKeystrokes: 1 },
@@ -683,7 +683,7 @@ def teardown():
 total = count + count
 print(count, total)
 return count`,
-          instructions: 'Search for "count" with /count Enter. Then press n to jump to each occurrence. Press N to go backward.',
+          instructions: '1. Search for "count" with /count Enter.\n2. Press n to jump to each occurrence.\n3. Press N to go backward.',
           hint: 'After /count Enter, press n repeatedly to cycle through matches.',
           goal: { type: 'manual' },
         },
@@ -706,7 +706,7 @@ return count`,
 if user:
     update_user(user)
     print(user.name)`,
-          instructions: 'Place your cursor on the word "user" and press * to find all occurrences. Press n to jump between them.',
+          instructions: '1. Place your cursor on the word "user" and press * to find all occurrences.\n2. Press n to jump between them.',
           hint: 'Move to "user", press *, then n to cycle through.',
           goal: { type: 'manual' },
         },
@@ -730,7 +730,7 @@ if user:
     if error:
         handle_error(error)
     return result`,
-          instructions: 'Search for "error", jump through all matches with n, then use * on "result" to quickly find all its occurrences.',
+          instructions: '1. Search for "error", jump through all matches with n.\n2. Use * on "result" to quickly find all its occurrences.',
           hint: '/error Enter, then n to cycle. Move to "result", press *.',
           goal: { type: 'manual' },
         },
@@ -857,7 +857,7 @@ print(config)`,
           initialText: `def process(input):
     data = transform([1, 2, 3])
     return {"result": data, "status": "ok"}`,
-          instructions: 'Try di( on the function params, di[ on the array, and di{ on the return object. See the difference between each.',
+          instructions: 'Try:\n\n- di( on the function params\n- di[ on the array\n- di{ on the return object\n\nSee the difference between each.',
           hint: 'Move inside (), press di(. Move inside [], press di[. Move inside {}, press di{.',
           goal: { type: 'manual' },
         },
@@ -883,7 +883,7 @@ print(config)`,
         exercise: {
           initialText: `greeting = "Hello, World!"
 name = 'Alice'`,
-          instructions: 'Place cursor anywhere on line 1 and press di" to delete the string contents (keep the quotes). Then di\' on line 2.',
+          instructions: 'Place cursor anywhere on line 1 and press di" to delete the string contents (keep the quotes).\n\nThen di\' on line 2.',
           hint: 'di" removes content between " ". di\' removes content between \' \'.',
           goal: { type: 'manual' },
         },
@@ -920,7 +920,7 @@ url = "https://example.com"`,
         exercise: {
           initialText: `title = "Old Title"
 author = "Unknown"`,
-          instructions: 'Use ci" on line 1 to change "Old Title" to "New Title". Use ci" on line 2 to change "Unknown" to your name.',
+          instructions: 'Use ci" on line 1 to change "Old Title" to "New Title".\n\nUse ci" on line 2 to change "Unknown" to your name.',
           hint: 'Move to line 1, press ci", type new string, Esc.',
           goal: { type: 'manual' },
         },
@@ -960,7 +960,7 @@ author = "Unknown"`,
     "greeting": 'Hello',
     "city": "New York",
 }`,
-          instructions: 'Practice ci" on the "Alice" string, ci\' on the \'Hello\' string, and ci" again on "New York". Change each value.',
+          instructions: 'Practice:\n\n- ci" on the "Alice" string\n- ci\' on the \'Hello\' string\n- ci" again on "New York"\n\nChange each value.',
           hint: 'Move into each string, press ci followed by the matching quote character, type a new value, Esc.',
           goal: { type: 'manual' },
         },
@@ -1044,7 +1044,7 @@ another_thing = 100`,
     subtotal = price * quantity
     savings = subtotal * discount
     return subtotal - savings`,
-          instructions: 'Use ciw to rename: "price" → "cost", "quantity" → "amount", "discount" → "reduction". Try to do it efficiently.',
+          instructions: 'Use ciw to rename:\n\n- "price" → "cost"\n- "quantity" → "amount"\n- "discount" → "reduction"\n\nTry to do it efficiently.',
           hint: 'Move to each word, press ciw, type the new name, Esc.',
           goal: { type: 'manual' },
         },
@@ -1187,7 +1187,7 @@ def footer():
     if user_data:
         print("Processing:", name)
         return {"name": name, "tags": tags, "config": config}`,
-          instructions: 'Practice a variety of text objects: ci" on "John Doe", di[ on the tags array contents, da{ on the config object, cip on the if block.',
+          instructions: 'Practice a variety of text objects:\n\n1. ci" on "John Doe"\n2. di[ on the tags array contents\n3. da{ on the config object\n4. cip on the if block',
           hint: 'ci" = change string, di[ = delete inside [], da{ = delete around {}, cip = change paragraph.',
           goal: { type: 'manual' },
         },
@@ -1213,7 +1213,7 @@ def footer():
         exercise: {
           initialText: `Select this word carefully.
 Then try selecting a whole phrase.`,
-          instructions: 'Press v to enter Visual mode, then use l to extend the selection rightward, or w to select word by word. Press Esc to cancel.',
+          instructions: '1. Press v to enter Visual mode.\n2. Extend the selection:\n- l to extend rightward\n- w to select word by word\n3. Press Esc to cancel.',
           hint: 'v enters visual mode, move cursor to expand selection, Esc to cancel.',
           goal: { type: 'mode-sequence', sequence: ['VISUAL', 'NORMAL'], reps: 1 },
         },
@@ -1234,7 +1234,7 @@ Then try selecting a whole phrase.`,
         exercise: {
           initialText: `Delete this middle portion of the line.
 Copy this phrase and paste it below.`,
-          instructions: 'On line 1: press v, select "middle portion", press d to delete. On line 2: select "this phrase", press y, then p to paste.',
+          instructions: 'On line 1: press v, select "middle portion", press d to delete.\n\nOn line 2: select "this phrase", press y, then p to paste.',
           hint: 'v → select → d (delete) or y (yank) → p (paste)',
           goal: { type: 'mode-sequence', sequence: ['VISUAL', 'NORMAL'], reps: 2 },
         },
@@ -1277,7 +1277,7 @@ Line B - select this
 Line C - select this
 Line D - select this
 Line E - keep`,
-          instructions: 'Press V to enter Visual Line mode on line B, then press 2j to extend to line D, then press d to delete all three lines.',
+          instructions: '1. Press V to enter Visual Line mode on line B.\n2. Press 2j to extend to line D.\n3. Press d to delete all three lines.',
           hint: 'V enters line visual mode, 2j extends 2 lines down, d deletes.',
           goal: { type: 'mode-sequence', sequence: ['VISUAL', 'NORMAL'], reps: 2 },
         },
@@ -1300,7 +1300,7 @@ Middle line A
 Middle line B
 Middle line C
 Bottom line`,
-          instructions: 'Press V on "Middle line B", extend up with k, press o, then extend down with j. Notice how o switches which end moves.',
+          instructions: '1. Press V on "Middle line B".\n2. Extend up with k.\n3. Press o, then extend down with j.\n\nNotice how o switches which end moves.',
           hint: 'V → extend → o to switch active end.',
           goal: { type: 'mode-sequence', sequence: ['VISUAL', 'NORMAL'], reps: 3 },
         },
@@ -1324,7 +1324,7 @@ Bottom line`,
 
 def second():
     return 2`,
-          instructions: 'Use V + j to select the "first" function (3 lines), yank with y, then paste it below the "second" function with p.',
+          instructions: '1. Use V + j to select the "first" function (3 lines).\n2. Yank with y.\n3. Paste it below the "second" function with p.',
           hint: 'V on "function first", 2j to extend, y to yank, move below second function, p to paste.',
           goal: { type: 'mode-sequence', sequence: ['VISUAL', 'NORMAL'], reps: 2 },
         },
@@ -1352,7 +1352,7 @@ def second():
           initialText: `name = "Alice"
 age = 999
 city = "NYC"`,
-          instructions: 'Delete line 2 with dd, then press u to undo it back. Press Ctrl+r to redo the deletion.',
+          instructions: '1. Delete line 2 with dd.\n2. Press u to undo it back.\n3. Press Ctrl+r to redo the deletion.',
           hint: 'dd deletes, u undoes, Ctrl+r redoes.',
           goal: { type: 'manual' },
         },
@@ -1371,7 +1371,7 @@ city = "NYC"`,
           '**U** undoes all changes to the current line at once.\n\nUnlike **u**, it doesn\'t step through one change at a time.\nIt restores the entire line to how it was when you moved to it.\n\nNote: **U** itself counts as a change, so pressing **u** right after **U** will undo the line-restore.',
         exercise: {
           initialText: `result = calculate_total(price, tax, discount)`,
-          instructions: 'Make a few edits on the line (use r, x, or i). Then press U to undo all changes to that line at once.',
+          instructions: '1. Make a few edits on the line (use r, x, or i).\n2. Press U to undo all changes to that line at once.',
           hint: 'Edit the line a few times, then press U to restore the whole line.',
           goal: { type: 'manual' },
         },
@@ -1403,7 +1403,7 @@ age = 30
 city = "NYC"
 
 # Jump back to the mark`,
-          instructions: 'Press ma on line 1 to set mark a. Navigate down a few lines. Press \'a to jump back to the marked line.',
+          instructions: '1. Press ma on line 1 to set mark a.\n2. Navigate down a few lines.\n3. Press \'a to jump back to the marked line.',
           hint: 'ma sets the mark, \'a jumps back to it.',
           goal: { type: 'manual' },
         },
@@ -1430,7 +1430,7 @@ def process():
 
 # End of the file
 result = process()`,
-          instructions: 'Press G to jump to the bottom, then gg to go to the top, then search /Middle. Now press Ctrl+o to go back through your jump history.',
+          instructions: '1. Press G to jump to the bottom.\n2. Press gg to go to the top.\n3. Search /Middle.\n4. Press Ctrl+o to go back through your jump history.',
           hint: 'Make several jumps (G, gg, /search), then Ctrl+o to walk back through them.',
           goal: { type: 'manual' },
         },
