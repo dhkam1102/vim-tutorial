@@ -12,6 +12,7 @@ type ProgressMap = Record<string, LessonProgress>
 type ProgressContextType = {
   progress: ProgressMap
   recordCompletion: (sectionId: string, lessonId: string) => void
+  clearCompletion: (sectionId: string, lessonId: string) => void
   isCompleted: (sectionId: string, lessonId: string) => boolean
 }
 
@@ -74,12 +75,29 @@ export function ProgressProvider({ children }: { children: React.ReactNode }) {
     })
   }
 
+  function clearCompletion(sectionId: string, lessonId: string) {
+    const key = `${sectionId}::${lessonId}`
+    setProgress((prev) => {
+      const next = { ...prev }
+      delete next[key]
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(next))
+      if (session?.user?.id) {
+        fetch('/api/progress', {
+          method: 'DELETE',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ sectionId, lessonId }),
+        }).catch(() => {})
+      }
+      return next
+    })
+  }
+
   function isCompleted(sectionId: string, lessonId: string): boolean {
     return !!progress[`${sectionId}::${lessonId}`]
   }
 
   return (
-    <ProgressContext.Provider value={{ progress, recordCompletion, isCompleted }}>
+    <ProgressContext.Provider value={{ progress, recordCompletion, clearCompletion, isCompleted }}>
       {children}
     </ProgressContext.Provider>
   )

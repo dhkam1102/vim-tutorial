@@ -55,6 +55,8 @@ type VimEditorProps = {
   onViewResults?: () => void
   onHintUsed?: () => void
   onReset?: () => void
+  onMarkIncomplete?: () => void
+  initialStatusMsg?: string
 }
 
 type VimModeLabel = 'NORMAL' | 'INSERT' | 'VISUAL' | 'VISUAL_LINE'
@@ -82,6 +84,8 @@ export default function VimEditor({
   onViewResults,
   onHintUsed,
   onReset,
+  onMarkIncomplete,
+  initialStatusMsg,
 }: VimEditorProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const viewRef = useRef<EditorView | null>(null)
@@ -118,6 +122,19 @@ export default function VimEditor({
   const [hasScore, setHasScore] = useState(false)
   const [blockedMsg, setBlockedMsg] = useState<string | null>(null)
   const blockedTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const [statusMsg, setStatusMsg] = useState<string | null>(initialStatusMsg ?? null)
+
+  useEffect(() => {
+    if (!initialStatusMsg) return
+    const el = containerRef.current
+    if (el) {
+      el.classList.add('cm-flash-success')
+      const onEnd = () => el.classList.remove('cm-flash-success')
+      el.addEventListener('animationend', onEnd, { once: true })
+    }
+    const t = setTimeout(() => setStatusMsg(null), 2000)
+    return () => clearTimeout(t)
+  }, [initialStatusMsg])
 
   const { theme } = useTheme()
   const { editorHeight, fontSize, lineNumbers: showLineNumbers } = usePreferences()
@@ -592,6 +609,11 @@ export default function VimEditor({
               {blockedMsg}
             </span>
           )}
+          {statusMsg && !completed && (
+            <span className="font-mono text-xs text-[var(--tn-green)]">
+              {statusMsg}
+            </span>
+          )}
           {completed && (
             <span className="font-mono text-xs font-semibold text-[var(--tn-green)]">
               ✓ Completed
@@ -629,6 +651,14 @@ export default function VimEditor({
           >
             reset
           </button>
+          {onMarkIncomplete && (
+            <button
+              onClick={onMarkIncomplete}
+              className="font-mono text-xs px-2 py-1 rounded border border-[var(--border)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:border-[var(--text-secondary)] transition-colors"
+            >
+              mark incomplete
+            </button>
+          )}
         </div>
       </div>
 

@@ -45,6 +45,7 @@
 
   --editor-bg:      #1a1e2e;
   --editor-bg-tint: #2c2536;
+  --editor-bg-tint-success: #1a2e1e;
 }
 
 [data-theme="light"] {
@@ -81,6 +82,7 @@
 
   --editor-bg:      #ffffff;
   --editor-bg-tint: #fef4f6;
+  --editor-bg-tint-success: #f0fef4;
 }
 
 /* ─── Base ──────────────────────────────────────────────────────────── */
@@ -244,6 +246,13 @@ body {
 .cm-flash-blocked {
   animation: blocked-shake 0.25s ease-out, blocked-tint 0.4s ease-out;
 }
+@keyframes success-tint {
+  0%   { background-color: var(--editor-bg-tint-success); }
+  100% { background-color: var(--editor-bg); }
+}
+.cm-flash-success {
+  animation: success-tint 0.5s ease-out;
+}
 
 /* ─── CodeMirror scrollbar ──────────────────────────────────────────── */
 .cm-scroller::-webkit-scrollbar {
@@ -276,6 +285,9 @@ body {
   }
   .cm-flash-blocked {
     animation: blocked-tint 0.4s ease-out !important;
+  }
+  .cm-flash-success {
+    animation: none;
   }
   .progress-fill {
     transition: none;

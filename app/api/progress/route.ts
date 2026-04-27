@@ -54,3 +54,22 @@ export async function POST(req: Request) {
 
   return NextResponse.json({ ok: true })
 }
+
+const deleteSchema = z.object({
+  sectionId: z.string(),
+  lessonId: z.string(),
+})
+
+export async function DELETE(req: Request) {
+  const session = await auth()
+  if (!session?.user?.id) return NextResponse.json({}, { status: 401 })
+
+  const parsed = deleteSchema.safeParse(await req.json())
+  if (!parsed.success) return NextResponse.json({ error: 'invalid' }, { status: 400 })
+
+  const { sectionId, lessonId } = parsed.data
+  await prisma.userProgress.deleteMany({
+    where: { userId: session.user.id, sectionId, lessonId },
+  })
+  return NextResponse.json({ ok: true })
+}

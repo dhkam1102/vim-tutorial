@@ -48,7 +48,8 @@ export default function LessonContent({ section, lesson, prev, next }: Props) {
   const [lastScore, setLastScore] = useState<ExerciseScore | null>(null)
   const [showModal, setShowModal] = useState(false)
   const [editorKey, setEditorKey] = useState(0)
-  const { recordCompletion, isCompleted } = useProgress()
+  const [editorFlashMsg, setEditorFlashMsg] = useState<string | undefined>(undefined)
+  const { recordCompletion, clearCompletion, isCompleted } = useProgress()
 
   const completed = isCompleted(section.id, lesson.id)
 
@@ -63,6 +64,15 @@ export default function LessonContent({ section, lesson, prev, next }: Props) {
   function handleRetry() {
     setShowModal(false)
     setLastScore(null)
+    setEditorFlashMsg(undefined)
+    setEditorKey((k) => k + 1)
+  }
+
+  function handleMarkIncomplete() {
+    clearCompletion(section.id, lesson.id)
+    setShowModal(false)
+    setLastScore(null)
+    setEditorFlashMsg('Marked as incomplete')
     setEditorKey((k) => k + 1)
   }
 
@@ -120,6 +130,8 @@ export default function LessonContent({ section, lesson, prev, next }: Props) {
           onViewResults={() => setShowModal(true)}
           onHintUsed={() => setHintsUsed(true)}
           onReset={() => setResetsUsed(true)}
+          onMarkIncomplete={completed ? handleMarkIncomplete : undefined}
+          initialStatusMsg={editorFlashMsg}
         />
       </div>
 
