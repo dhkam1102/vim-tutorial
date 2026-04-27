@@ -24,3 +24,8 @@ All agents defined in `.claude/agents/` MUST follow these rules.
 
 ### Build gate
 - No agent may report "done" without a passing `npm run build`
+
+## Default working mode
+- 진단/구현이 명확한 작업은 자율 진행
+- 단, wording / 구조 변경 / 새 dependency는 항상 사전 보고
+- 막히거나 추측해야 할 상황이면 멈추고 질문

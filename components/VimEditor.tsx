@@ -532,8 +532,8 @@ export default function VimEditor({
   return (
     <div>
       <div className="mb-3 p-5 bg-[var(--bg-surface)] rounded border border-[var(--border)]">
-        <p className="font-mono text-sm text-[var(--text-secondary)] leading-[1.9]">
-          <span className="text-[var(--accent)] font-semibold">Exercise: </span>
+        <p className="font-mono text-sm text-[var(--text-secondary)] leading-[1.9] whitespace-pre-line">
+          <span className="text-[var(--accent)] font-semibold">Exercise</span>{'\n'}
           {instructions}
         </p>
       </div>
