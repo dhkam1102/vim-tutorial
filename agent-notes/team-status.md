@@ -4,66 +4,76 @@
 
 ### Demo terminology fix (E7) ✅
 - 8 demo description strings: EDIT → Insert mode, NAV → Normal mode
-- Lines affected: §2.1, §2.2, §2.3, §4.1, §4.3 demo steps
 
 ### Exercise instruction readability ✅
-- 30 of 55 exercise instructions reformatted (25 already clear, left as-is)
-- 20 numbered lists (sequential steps)
-- 6 \n\n separations (independent parallel tasks)
-- 4 bullet lists (unordered practice items)
-- Wording untouched — structure/formatting only
+- 30 of 55 exercise instructions reformatted (numbered lists, bullets, \n\n)
+- CSS: whitespace-pre-line on instruction element
+- Label: "Exercise:" → "Exercise" with line break separation
 
 ### Sidebar visual hierarchy ✅
 - Section headers brightened: --text-secondary → --text-muted
-- Thin border-top divider added between section groups (non-first)
-- Files: globals.css, Sidebar.tsx
+- Border-top divider between section groups
 
-### Phase 2 plan document ✅
-- Written to `agent-notes/phase-2-plan.md`
-- 36 manual exercises catalogued with recommended goal types
-- Key finding: text-matches likely unnecessary if instructions are rewritten to specify exact targets
+### Sidebar account info → Preferences ✅
+- Email + Sign out moved into Preferences panel
+- UserWidget.tsx now unused (can delete)
+
+### Hydration mismatch fix ✅
+- border-t conditional on Sidebar section groups
+
+### Mark incomplete button ✅
+- Per-lesson "mark incomplete" in toolbar with visual feedback
+
+### Topic title rename (5 topics) ✅
+- Modes → Basics
+- Deleting and Changing → Core Editing
+- Line Navigation → Line Control
+- Searching → Search
+- Selecting Text → Visual Mode
+
+### MODES lesson reorder ✅
+- New order: Intro to Modes → Insert Mode → Basic Movement → Moving by Words
+
+### Analysis & planning docs ✅
+- `agent-notes/code-length-impact.md` — initialText length change impact
+- `agent-notes/codebase-options.md` — 5 codebase candidates for unification
+- `agent-notes/lesson-triage.md` — 55-lesson triage table
+- `agent-notes/lesson-review.txt` — per-lesson review checklist (blank)
+- `agent-notes/curriculum-restructure-plan.md` — 11-topic restructure plan
 
 ---
 
 ## Prior completed work
 
 ### Phase 1 engine — 9/9 complete ✅
-Plan: `~/.claude/plans/valiant-tumbling-torvalds.md`
-
 ### @pedagogy Phase A+B — complete
-- Phase A: 5/5 broken lessons fixed
-- Phase B: 15/15 description appends applied
-- Additional: 38 em-dashes removed, 5 Vim command accuracy fixes (E1,E3-E6)
-
 ### Sub-step 4: allowedKeys visual flash ✅
 ### Sub-step 8: Completion feedback (redesigned) ✅
 ### Editor height preference ✅
 
 ---
 
-## Plan progress
+## Next session
 
-### Phase 2 curriculum migration — NOT STARTED
-- Plan doc ready: `agent-notes/phase-2-plan.md`
-- Owner will do manual conversion exercise-by-exercise
-- 36 manual exercises → ~35 auto-graded + 1 deferred (window-scrolls)
+Start message:
+> Title rename + restructure plan까지 끝내고 푸시함.
+> 오늘은 11-topic restructure 시작 예정.
+> agent-notes/curriculum-restructure-plan.md 읽고 Phase A부터.
 
----
+Tasks:
+- 11-topic restructure Phase A — reorder topics, keep IDs
+- 6 new lessons (Phase B)
+- Codebase unification (ref: `agent-notes/codebase-options.md`)
 
-## Remaining work
+## Deferred
 
-### Next session
-- Phase 2: manually convert exercises one-by-one (owner-driven)
-- Reference: `agent-notes/phase-2-plan.md` for per-exercise recommendations
+- Lesson triage — user fills `agent-notes/lesson-review.txt` manually
+- Phase 2 curriculum migration (37 manual → auto-graded)
+- Brewlog rewrite (with codebase unification)
+- Personal best tracking
+- E2 insert-at-line-ends fix
+- Admin page stars cleanup
 
-### Deferred
-- E2 insert-at-line-ends: mismatched instructions/initialText (needs pedagogy + exercise-design)
-- A3 allowedKeys enforcement for motion lessons (Phase 2 scope)
-- Brewlog exercise rewrite (blocked on Phase 2)
-- Target highlight restyle (blocked on Phase 2)
-- Personal best tracking (Modal Step 2, localStorage)
-- "You beat X%" relative comparison (needs data)
+## Known issues
 
-### Known issues
-- /api/progress 500 (MySQL not running) — fix when DB is up
-- Admin page still references stars (backend not touched)
+- /api/progress 500 (MySQL not running)

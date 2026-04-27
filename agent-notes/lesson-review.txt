@@ -1,0 +1,509 @@
+Lesson Review Checklist
+=======================
+
+Keep: yes / no / maybe
+설명/Demo/Exercise: ok / fix / replace / skip
+Notes: free-form
+
+
+================================================================
+MODES (4 lessons)
+================================================================
+
+--- L1: Intro to Modes (intro-to-modes) ---
+Keep:
+설명:
+Demo:
+Exercise:
+Notes:
+
+
+--- L2: Basic Movement (basic-movement) ---
+Keep:
+설명:
+Demo:
+Exercise:
+Notes:
+
+
+--- L3: Moving by Words (moving-by-words) ---
+Keep:
+설명:
+Demo:
+Exercise:
+Notes:
+
+
+--- L4: Insert Mode (insert-mode) ---
+Keep:
+설명:
+Demo:
+Exercise:
+Notes:
+
+
+================================================================
+INSERTION (3 lessons)
+================================================================
+
+--- L5: Insert at Line Ends (insert-at-line-ends) ---
+Keep:
+설명:
+Demo:
+Exercise:
+Notes:
+
+
+--- L6: Opening New Lines (opening-new-lines) ---
+Keep:
+설명:
+Demo:
+Exercise:
+Notes:
+
+
+--- L7: Making Small Edits (making-small-edits) ---
+Keep:
+설명:
+Demo:
+Exercise:
+Notes:
+
+
+================================================================
+MOTIONS (4 lessons)
+================================================================
+
+--- L8: Moving by WORDs (moving-by-words) ---
+Keep:
+설명:
+Demo:
+Exercise:
+Notes:
+
+
+--- L9: Moving to Line Ends (moving-to-line-ends) ---
+Keep:
+설명:
+Demo:
+Exercise:
+Notes:
+
+
+--- L10: Find Character (find-character) ---
+Keep:
+설명:
+Demo:
+Exercise:
+Notes:
+
+
+--- L11: Till Character (till-character) ---
+Keep:
+설명:
+Demo:
+Exercise:
+Notes:
+
+
+================================================================
+DELETING AND CHANGING (6 lessons)
+================================================================
+
+--- L12: Intro to Operators (intro-to-operators) ---
+Keep:
+설명:
+Demo:
+Exercise:
+Notes:
+
+
+--- L13: Delete Words (delete-words) ---
+Keep:
+설명:
+Demo:
+Exercise:
+Notes:
+
+
+--- L14: Change Words (change-words) ---
+Keep:
+설명:
+Demo:
+Exercise:
+Notes:
+
+
+--- L15: Delete Lines (delete-lines) ---
+Keep:
+설명:
+Demo:
+Exercise:
+Notes:
+
+
+--- L16: Delete Multiple Lines (delete-multiple-lines) ---
+Keep:
+설명:
+Demo:
+Exercise:
+Notes:
+
+
+--- L17: Copy/Paste Lines (copy-paste-lines) ---
+Keep:
+설명:
+Demo:
+Exercise:
+Notes:
+
+
+================================================================
+LINE NAVIGATION (4 lessons)
+================================================================
+
+--- L18: Relative Line Jumps (relative-line-jumps) ---
+Keep:
+설명:
+Demo:
+Exercise:
+Notes:
+
+
+--- L19: Absolute Line Jumps (absolute-line-jumps) ---
+Keep:
+설명:
+Demo:
+Exercise:
+Notes:
+
+
+--- L20: Paragraph Jumps (paragraph-jumps) ---
+Keep:
+설명:
+Demo:
+Exercise:
+Notes:
+
+
+--- L21: Window Scrolls (window-scrolls) ---
+Keep:
+설명:
+Demo:
+Exercise:
+Notes:
+
+
+================================================================
+SEARCHING (4 lessons)
+================================================================
+
+--- L22: Search (search) ---
+Keep:
+설명:
+Demo:
+Exercise:
+Notes:
+
+
+--- L23: Repeat Search (repeat-search) ---
+Keep:
+설명:
+Demo:
+Exercise:
+Notes:
+
+
+--- L24: Quick Word Search (quick-word-search) ---
+Keep:
+설명:
+Demo:
+Exercise:
+Notes:
+
+
+--- L25: Search Review (search-review) ---
+Keep:
+설명:
+Demo:
+Exercise:
+Notes:
+
+
+================================================================
+BRACKETS (6 lessons)
+================================================================
+
+--- L26: Intro to Text Objects (intro-to-text-objects) ---
+Keep:
+설명:
+Demo:
+Exercise:
+Notes:
+
+
+--- L27: Delete Inside Brackets (delete-inside-brackets) ---
+Keep:
+설명:
+Demo:
+Exercise:
+Notes:
+
+
+--- L28: Delete Around Brackets (delete-around-brackets) ---
+Keep:
+설명:
+Demo:
+Exercise:
+Notes:
+
+
+--- L29: Change Inside Brackets (change-inside-brackets) ---
+Keep:
+설명:
+Demo:
+Exercise:
+Notes:
+
+
+--- L30: Change Around Brackets (change-around-brackets) ---
+Keep:
+설명:
+Demo:
+Exercise:
+Notes:
+
+
+--- L31: Brackets Review (brackets-review) ---
+Keep:
+설명:
+Demo:
+Exercise:
+Notes:
+
+
+================================================================
+QUOTES (5 lessons)
+================================================================
+
+--- L32: Delete Inside Quotes (delete-inside-quotes) ---
+Keep:
+설명:
+Demo:
+Exercise:
+Notes:
+
+
+--- L33: Delete Around Quotes (delete-around-quotes) ---
+Keep:
+설명:
+Demo:
+Exercise:
+Notes:
+
+
+--- L34: Change Inside Quotes (change-inside-quotes) ---
+Keep:
+설명:
+Demo:
+Exercise:
+Notes:
+
+
+--- L35: Change Around Quotes (change-around-quotes) ---
+Keep:
+설명:
+Demo:
+Exercise:
+Notes:
+
+
+--- L36: Quotes Review (quotes-review) ---
+Keep:
+설명:
+Demo:
+Exercise:
+Notes:
+
+
+================================================================
+WORDS (4 lessons)
+================================================================
+
+--- L37: Delete Inside Word (delete-inside-word) ---
+Keep:
+설명:
+Demo:
+Exercise:
+Notes:
+
+
+--- L38: Delete Around Word (delete-around-word) ---
+Keep:
+설명:
+Demo:
+Exercise:
+Notes:
+
+
+--- L39: Change Inside Word (change-inside-word) ---
+Keep:
+설명:
+Demo:
+Exercise:
+Notes:
+
+
+--- L40: Words Review (words-review) ---
+Keep:
+설명:
+Demo:
+Exercise:
+Notes:
+
+
+================================================================
+PARAGRAPHS (4 lessons)
+================================================================
+
+--- L41: Delete Inside Paragraph (delete-inside-paragraph) ---
+Keep:
+설명:
+Demo:
+Exercise:
+Notes:
+
+
+--- L42: Delete Around Paragraph (delete-around-paragraph) ---
+Keep:
+설명:
+Demo:
+Exercise:
+Notes:
+
+
+--- L43: Change Inside Paragraph (change-inside-paragraph) ---
+Keep:
+설명:
+Demo:
+Exercise:
+Notes:
+
+
+--- L44: Paragraphs Review (paragraphs-review) ---
+Keep:
+설명:
+Demo:
+Exercise:
+Notes:
+
+
+================================================================
+TEXT OBJECTS REVIEW (1 lesson)
+================================================================
+
+--- L45: Text Objects Mega Review (mega-review) ---
+Keep:
+설명:
+Demo:
+Exercise:
+Notes:
+
+
+================================================================
+SELECTING TEXT (6 lessons)
+================================================================
+
+--- L46: Intro to Visual Mode (intro-to-visual-mode) ---
+Keep:
+설명:
+Demo:
+Exercise:
+Notes:
+
+
+--- L47: Visual Mode Operators (visual-mode-operators) ---
+Keep:
+설명:
+Demo:
+Exercise:
+Notes:
+
+
+--- L48: Switch Selection Ends (switch-selection-ends) ---
+Keep:
+설명:
+Demo:
+Exercise:
+Notes:
+
+
+--- L49: Visual Line Mode (visual-line-mode) ---
+Keep:
+설명:
+Demo:
+Exercise:
+Notes:
+
+
+--- L50: Switch Visual Line Ends (switch-visual-line-ends) ---
+Keep:
+설명:
+Demo:
+Exercise:
+Notes:
+
+
+--- L51: Visual Line Operators (visual-line-operators) ---
+Keep:
+설명:
+Demo:
+Exercise:
+Notes:
+
+
+================================================================
+UNDO & REDO (2 lessons)
+================================================================
+
+--- L52: Undo / Redo (undo-redo) ---
+Keep:
+설명:
+Demo:
+Exercise:
+Notes:
+
+
+--- L53: Undo Line Changes (undo-line-changes) ---
+Keep:
+설명:
+Demo:
+Exercise:
+Notes:
+
+
+================================================================
+MARKS & JUMPS (2 lessons)
+================================================================
+
+--- L54: Setting Marks (setting-marks) ---
+Keep:
+설명:
+Demo:
+Exercise:
+Notes:
+
+
+--- L55: Jump List (jump-list) ---
+Keep:
+설명:
+Demo:
+Exercise:
+Notes:
+
+
+================================================================
+PROGRESS
+================================================================
+Reviewed: 0 / 55
+Last session:
