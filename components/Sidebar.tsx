@@ -3,12 +3,12 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useState } from 'react'
+import { useSession, signOut } from 'next-auth/react'
 import { curriculum } from '@/data/curriculum'
 import { useTheme } from '@/context/ThemeContext'
 import { usePreferences } from '@/context/PreferencesContext'
 import { useProgress } from '@/context/ProgressContext'
 import KeyBadge from './KeyBadge'
-import UserWidget from './UserWidget'
 
 function GearIcon() {
   return (
@@ -23,6 +23,7 @@ export default function Sidebar({ onCollapse }: { onCollapse?: () => void }) {
   const pathname = usePathname()
   const { theme, setTheme } = useTheme()
   const { editorHeight, setEditorHeight, fontSize, setFontSize, lineNumbers, setLineNumbers } = usePreferences()
+  const { data: session } = useSession()
   const { isCompleted } = useProgress()
   const [settingsOpen, setSettingsOpen] = useState(false)
 
@@ -179,12 +180,32 @@ export default function Sidebar({ onCollapse }: { onCollapse?: () => void }) {
                 ))}
               </div>
             </div>
+            {/* Account */}
+            <div className="border-t border-[var(--border)] pt-3 mt-3">
+              {session ? (
+                <div className="flex items-center justify-between">
+                  <span className="font-mono text-sm text-[var(--text-secondary)] truncate mr-3" title={session.user?.email ?? undefined}>
+                    {session.user?.email}
+                  </span>
+                  <button
+                    onClick={() => signOut({ callbackUrl: '/' })}
+                    className="font-mono text-xs text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] rounded"
+                  >
+                    Sign out
+                  </button>
+                </div>
+              ) : (
+                <Link
+                  href="/auth/login"
+                  className="block font-mono text-xs text-[var(--text-secondary)] hover:text-[var(--accent)] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] rounded"
+                >
+                  Sign in to save progress →
+                </Link>
+              )}
+            </div>
           </div>
         </div>
       )}
-
-      {/* User widget */}
-      <UserWidget />
 
       {/* Gear button */}
       <div className="border-t border-[var(--border)] px-4 py-3 shrink-0">
