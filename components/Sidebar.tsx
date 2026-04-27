@@ -78,7 +78,7 @@ export default function Sidebar({ onCollapse }: { onCollapse?: () => void }) {
                         <span className="truncate">{lesson.title}</span>
                         <span className="flex items-center gap-1.5 shrink-0">
                           {done && <span className="text-xs font-semibold text-[var(--tn-green)]">✓</span>}
-                          {lesson.keys.slice(0, 2).map((k, i) => (
+                          {lesson.keys.slice(0, 3).map((k, i) => (
                             <KeyBadge key={i} keyName={k} />
                           ))}
                         </span>

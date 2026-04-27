@@ -1,77 +1,62 @@
 # Team Status — 2026-04-27
 
-## Completed work (2026-04-27 session)
+## Completed work (2026-04-27, push 2)
 
-### Demo terminology fix (E7) ✅
-- 8 demo description strings: EDIT → Insert mode, NAV → Normal mode
+### 11-topic curriculum restructure (Phase A)
+- 14 → 11 sections, 55 → 50 lessons
+- Sections: basics, core-editing, line-control, precise-movement, text-objects, search, visual-mode, advanced-navigation, undo-redo, marks-and-jumps, command-mode (empty)
+- 5 lessons removed: moving-by-words duplicate, 3 review lessons, mega-review
+- 27 lessons moved between sections
+- 3 section IDs renamed: basic-operators → core-editing, advanced-vertical-movement → line-control, essential-motions → precise-movement
+- localStorage v1 + v2 migration chain
+- 31 specific URL redirects + 3 wildcard section redirects
+- DB migration script (scripts/migrate-progress-db.sql)
+- Server-side auto-migration on GET /api/progress
+- Sidebar key display: 2 → 3 keys
 
-### Exercise instruction readability ✅
-- 30 of 55 exercise instructions reformatted (numbered lists, bullets, \n\n)
-- CSS: whitespace-pre-line on instruction element
-- Label: "Exercise:" → "Exercise" with line break separation
+## Completed work (2026-04-27, push 1)
 
-### Sidebar visual hierarchy ✅
-- Section headers brightened: --text-secondary → --text-muted
-- Border-top divider between section groups
-
-### Sidebar account info → Preferences ✅
-- Email + Sign out moved into Preferences panel
-- UserWidget.tsx now unused (can delete)
-
-### Hydration mismatch fix ✅
-- border-t conditional on Sidebar section groups
-
-### Mark incomplete button ✅
-- Per-lesson "mark incomplete" in toolbar with visual feedback
-
-### Topic title rename (5 topics) ✅
-- Modes → Basics
-- Deleting and Changing → Core Editing
-- Line Navigation → Line Control
-- Searching → Search
-- Selecting Text → Visual Mode
-
-### MODES lesson reorder ✅
-- New order: Intro to Modes → Insert Mode → Basic Movement → Moving by Words
-
-### Analysis & planning docs ✅
-- `agent-notes/code-length-impact.md` — initialText length change impact
-- `agent-notes/codebase-options.md` — 5 codebase candidates for unification
-- `agent-notes/lesson-triage.md` — 55-lesson triage table
-- `agent-notes/lesson-review.txt` — per-lesson review checklist (blank)
-- `agent-notes/curriculum-restructure-plan.md` — 11-topic restructure plan
+- E7/A3 demo terminology fix
+- Exercise instruction readability (30/55 reformatted)
+- Sidebar visual hierarchy + account info → Preferences
+- Hydration mismatch fix
+- Mark incomplete button
+- Topic title rename (5 topics)
+- MODES lesson reorder
+- Analysis & planning docs
 
 ---
 
 ## Prior completed work
 
-### Phase 1 engine — 9/9 complete ✅
+### Phase 1 engine — 9/9 complete
 ### @pedagogy Phase A+B — complete
-### Sub-step 4: allowedKeys visual flash ✅
-### Sub-step 8: Completion feedback (redesigned) ✅
-### Editor height preference ✅
+### Sub-step 4: allowedKeys visual flash
+### Sub-step 8: Completion feedback (redesigned)
+### Editor height preference
 
 ---
 
-## Next session
+## Next session (Phase B)
 
 Start message:
-> Title rename + restructure plan까지 끝내고 푸시함.
-> 오늘은 11-topic restructure 시작 예정.
-> agent-notes/curriculum-restructure-plan.md 읽고 Phase A부터.
+> 어제 vim tutorial 이어서. 11-topic restructure 완료, push함.
+> 오늘은 Phase B 시작 — 신규 lesson 8개 작성 + TEXT OBJECTS 통합.
+> agent-notes/curriculum-restructure-plan.md 참고.
 
 Tasks:
-- 11-topic restructure Phase A — reorder topics, keep IDs
-- 6 new lessons (Phase B)
-- Codebase unification (ref: `agent-notes/codebase-options.md`)
+- 8 new lessons: Repeat Last Edit (.), Join Lines (J), Indent Lines (>>, <<), Intro to Text Objects, Using Marks ('a, `a), Saving & Quitting (:w, :q), Search & Replace, Ranges
+- TEXT OBJECTS 16 → 4 lesson consolidation
+- switch-visual-line-ends → switch-selection-ends merge
 
 ## Deferred
 
 - Lesson triage — user fills `agent-notes/lesson-review.txt` manually
 - Phase 2 curriculum migration (37 manual → auto-graded)
-- Brewlog rewrite (with codebase unification)
-- Personal best tracking
+- Codebase unification (Brewlog rewrite)
+- 4+ key lesson review (basic-movement: h j k l, only l hidden)
 - E2 insert-at-line-ends fix
+- Personal best tracking
 - Admin page stars cleanup
 
 ## Known issues

@@ -107,26 +107,6 @@ export const curriculum: Section[] = [
         },
       },
       {
-        id: 'insert-mode',
-        title: 'Insert Mode',
-        keys: ['i', 'a', 'esc'],
-        description:
-          '**i** and **a** both enter Insert mode, just from different positions.\n\n**i** inserts before the cursor.\n**a** inserts after the cursor.\n**Esc** always returns you to Normal mode.\nMost vim work follows the same loop: navigate in Normal, edit in Insert, Esc back.',
-        demo: [
-          { mode: 'NORMAL', text: 'name = ""\nrole = ""', cursor: [0, 7], description: 'Cursor inside the empty string.' },
-          { key: 'i', mode: 'INSERT', text: 'name = ""\nrole = ""', cursor: [0, 7], description: 'i enters Insert mode before the cursor.' },
-          { key: 'type', mode: 'INSERT', text: 'name = "Alice"\nrole = ""', cursor: [0, 12], description: 'Type the value.' },
-          { key: 'Esc', mode: 'NORMAL', text: 'name = "Alice"\nrole = ""', cursor: [0, 11], description: 'Esc returns to Normal mode.' },
-        ],
-        exercise: {
-          initialText: `print("Hello, !")
-name = ""`,
-          instructions: 'Use i or a to insert "World" after the comma on line 1, and your name on line 2.',
-          hint: 'Move to the ! on line 1, press i, type "World", press Esc.',
-          goal: { type: 'mode-sequence', sequence: ['INSERT', 'NORMAL'], reps: 2 },
-        },
-      },
-      {
         id: 'basic-movement',
         title: 'Basic Movement',
         keys: ['h', 'j', 'k', 'l'],
@@ -160,42 +140,25 @@ active = True`,
         },
       },
       {
-        id: 'moving-by-words',
-        title: 'Moving by Words',
-        keys: ['w', 'e', 'b'],
+        id: 'insert-mode',
+        title: 'Insert Mode',
+        keys: ['i', 'a', 'esc'],
         description:
-          '**w**, **e**, and **b** move you through text word by word.\n\n**w** jumps to the start of the next word.\n**e** jumps to the end of the current word (…or the end of the next word if you\'re already at one).\n**b** jumps back one word.\nMuch faster than holding l to crawl through a line.',
+          '**i** and **a** both enter Insert mode, just from different positions.\n\n**i** inserts before the cursor.\n**a** inserts after the cursor.\n**Esc** always returns you to Normal mode.\nMost vim work follows the same loop: navigate in Normal, edit in Insert, Esc back.',
         demo: [
-          { mode: 'NORMAL', text: 'greeting = "Hello, World!"', cursor: [0, 0], description: 'Cursor on g of greeting.' },
-          { key: 'w', mode: 'NORMAL', text: 'greeting = "Hello, World!"', cursor: [0, 9], description: 'w jumps to next word (=).' },
-          { key: 'w', mode: 'NORMAL', text: 'greeting = "Hello, World!"', cursor: [0, 11], description: 'w again, jumps to "' },
-          { key: 'e', mode: 'NORMAL', text: 'greeting = "Hello, World!"', cursor: [0, 16], description: 'e jumps to end of next word.' },
-          { key: 'b', mode: 'NORMAL', text: 'greeting = "Hello, World!"', cursor: [0, 12], description: 'b jumps back one word.' },
+          { mode: 'NORMAL', text: 'name = ""\nrole = ""', cursor: [0, 7], description: 'Cursor inside the empty string.' },
+          { key: 'i', mode: 'INSERT', text: 'name = ""\nrole = ""', cursor: [0, 7], description: 'i enters Insert mode before the cursor.' },
+          { key: 'type', mode: 'INSERT', text: 'name = "Alice"\nrole = ""', cursor: [0, 12], description: 'Type the value.' },
+          { key: 'Esc', mode: 'NORMAL', text: 'name = "Alice"\nrole = ""', cursor: [0, 11], description: 'Esc returns to Normal mode.' },
         ],
         exercise: {
-          initialText: `greeting = "Hello, World!"
-count = 42
-message = greeting + str(count)`,
-          instructions: '1. Use w to jump forward word by word to reach "World".\n2. Use b to go back to "Hello".',
-          hint: 'w moves forward one word at a time. b moves backward.',
-          goal: { type: 'cursor-reach', targets: [
-            { target: [0, 9], idealKeystrokes: 1 },
-            { target: [0, 11], idealKeystrokes: 1 },
-            { target: [0, 12], idealKeystrokes: 1 },
-            { target: [0, 16], idealKeystrokes: 1 },
-            { target: [0, 17], idealKeystrokes: 1 },
-            { target: [0, 12], idealKeystrokes: 1 },
-            { target: [0, 11], idealKeystrokes: 1 },
-            { target: [0, 9], idealKeystrokes: 1 },
-          ] },
+          initialText: `print("Hello, !")
+name = ""`,
+          instructions: 'Use i or a to insert "World" after the comma on line 1, and your name on line 2.',
+          hint: 'Move to the ! on line 1, press i, type "World", press Esc.',
+          goal: { type: 'mode-sequence', sequence: ['INSERT', 'NORMAL'], reps: 2 },
         },
       },
-    ],
-  },
-  {
-    id: 'insert-like-a-pro',
-    title: 'Insertion',
-    lessons: [
       {
         id: 'insert-at-line-ends',
         title: 'Insert at Line Ends',
@@ -260,8 +223,8 @@ primt(mesage)`,
     ],
   },
   {
-    id: 'essential-motions',
-    title: 'Motions',
+    id: 'core-editing',
+    title: 'Core Editing',
     lessons: [
       {
         id: 'moving-by-words',
@@ -292,99 +255,6 @@ response = requests.get(url).json()`,
           ] },
         },
       },
-      {
-        id: 'moving-to-line-ends',
-        title: 'Moving to Line Ends',
-        keys: ['0', '_', '$'],
-        description:
-          'Three keys get you to different positions on the current line.\n\n**0** jumps to column 0, the very start of the line.\n**_** jumps to the first non-blank character.\n**$** jumps to the end of the line.',
-        demo: [
-          { mode: 'NORMAL', text: '    x = 10\n    y = 20', cursor: [0, 4], description: 'Cursor on x (first non-blank).' },
-          { key: '$', mode: 'NORMAL', text: '    x = 10\n    y = 20', cursor: [0, 9], description: '$ jumps to end of line.' },
-          { key: '0', mode: 'NORMAL', text: '    x = 10\n    y = 20', cursor: [0, 0], description: '0 jumps to column 0 (before the spaces).' },
-          { key: '_', mode: 'NORMAL', text: '    x = 10\n    y = 20', cursor: [0, 4], description: '_ jumps to first non-blank char.' },
-        ],
-        exercise: {
-          initialText: `    x = 10
-    y = 20
-    z = x + y`,
-          instructions: 'On line 1:\n\n1. Press $ to go to the end.\n2. Press 0 to go to column 0.\n3. Press _ to jump back to x (the first non-blank character).',
-          hint: '$ = end of line, 0 = column 0, _ = first non-blank char',
-          goal: { type: 'cursor-reach', targets: [
-            { target: [0, 9], idealKeystrokes: 1 },
-            { target: [0, 4], idealKeystrokes: 1 },
-            { target: [0, 0], idealKeystrokes: 1 },
-            { target: [1, 9], idealKeystrokes: 2 },
-            { target: [1, 4], idealKeystrokes: 1 },
-            { target: [1, 0], idealKeystrokes: 1 },
-            { target: [2, 12], idealKeystrokes: 2 },
-            { target: [2, 4], idealKeystrokes: 1 },
-          ] },
-        },
-      },
-      {
-        id: 'find-character',
-        title: 'Find Character',
-        keys: ['f', 'F', ';'],
-        description:
-          '**f** jumps to a character on the current line.\n\n**f{char}** moves forward to the next occurrence of that character.\n**F{char}** moves backward to the character, landing on it.\n**;** repeats the last search in the same direction.',
-        demo: [
-          { mode: 'NORMAL', text: 'def calc(price, tax, discount):', cursor: [0, 0], description: 'Cursor at start of line.' },
-          { key: 'f,', mode: 'NORMAL', text: 'def calc(price, tax, discount):', cursor: [0, 14], description: 'f, jumps to the first comma.' },
-          { key: ';', mode: 'NORMAL', text: 'def calc(price, tax, discount):', cursor: [0, 19], description: '; repeats, jumps to next comma.' },
-          { key: 'F,', mode: 'NORMAL', text: 'def calc(price, tax, discount):', cursor: [0, 14], description: 'F, searches backward.' },
-        ],
-        exercise: {
-          initialText: `def calculate_total(price, tax, discount):
-    return price + tax - discount`,
-          instructions: '1. On line 1, press f( to jump to the opening parenthesis.\n2. Press ; to jump to the next comma.',
-          hint: 'f( jumps to (, then ; repeats to find the next match.',
-          goal: { type: 'cursor-reach', targets: [
-            { target: [0, 4], idealKeystrokes: 1 },
-            { target: [0, 7], idealKeystrokes: 1 },
-            { target: [0, 23], idealKeystrokes: 1 },
-            { target: [0, 35], idealKeystrokes: 1 },
-            { target: [0, 23], idealKeystrokes: 1 },
-            { target: [0, 7], idealKeystrokes: 1 },
-            { target: [0, 4], idealKeystrokes: 1 },
-            { target: [0, 25], idealKeystrokes: 1 },
-          ] },
-        },
-      },
-      {
-        id: 'till-character',
-        title: 'Till Character',
-        keys: ['t', 'T', ';'],
-        description:
-          '**t** is like **f**, but stops one character short.\n\n**t{char}** moves the cursor just before the target character.\n**T{char}** does the same thing backward, stopping one character to the right of the target.\nOften more useful than f when you want to land right before something.',
-        demo: [
-          { mode: 'NORMAL', text: 'result = do_something(value, callback)', cursor: [0, 0], description: 'Cursor at start.' },
-          { key: 'f)', mode: 'NORMAL', text: 'result = do_something(value, callback)', cursor: [0, 37], description: 'f) lands ON the ).' },
-          { key: 'b', mode: 'NORMAL', text: 'result = do_something(value, callback)', cursor: [0, 29], description: 'b back to callback.' },
-          { key: 't)', mode: 'NORMAL', text: 'result = do_something(value, callback)', cursor: [0, 36], description: 't) stops one char BEFORE ).' },
-        ],
-        exercise: {
-          initialText: `result = do_something(value, callback)`,
-          instructions: 'Use t) to move just before the closing parenthesis. Notice the cursor stops one character before ) unlike f).',
-          hint: 't) stops before the ), f) stops on the ).',
-          goal: { type: 'cursor-reach', targets: [
-            { target: [0, 20], idealKeystrokes: 1 },
-            { target: [0, 26], idealKeystrokes: 1 },
-            { target: [0, 36], idealKeystrokes: 1 },
-            { target: [0, 28], idealKeystrokes: 1 },
-            { target: [0, 22], idealKeystrokes: 1 },
-            { target: [0, 26], idealKeystrokes: 1 },
-            { target: [0, 36], idealKeystrokes: 1 },
-            { target: [0, 8], idealKeystrokes: 1 },
-          ] },
-        },
-      },
-    ],
-  },
-  {
-    id: 'basic-operators',
-    title: 'Core Editing',
-    lessons: [
       {
         id: 'intro-to-operators',
         title: 'Intro to Operators',
@@ -446,6 +316,101 @@ baz = 100`,
         },
       },
       {
+        id: 'copy-paste-lines',
+        title: 'Copy/Paste Lines',
+        keys: ['y', 'p', 'P'],
+        description:
+          '**yy** copies the current line. **p** and **P** paste it.\n\n**yy** yanks the full line.\n**p** pastes below the current line.\n**P** pastes above.',
+        demo: [
+          { mode: 'NORMAL', text: 'PI = 3.14159\n# paste below', cursor: [0, 0], description: 'Cursor on line to copy.' },
+          { key: 'yy', mode: 'NORMAL', text: 'PI = 3.14159\n# paste below', cursor: [0, 0], description: 'yy yanks the line into register.' },
+          { key: 'j', mode: 'NORMAL', text: 'PI = 3.14159\n# paste below', cursor: [1, 0], description: 'Move to target line.' },
+          { key: 'p', mode: 'NORMAL', text: 'PI = 3.14159\n# paste below\nPI = 3.14159', cursor: [2, 0], description: 'p pastes below.' },
+        ],
+        exercise: {
+          initialText: `PI = 3.14159
+# paste the PI line below here
+
+# paste it above this comment`,
+          instructions: '1. Yank the PI line with yy.\n2. Paste it below the first comment with p.\n3. Paste it above the second comment with P.',
+          hint: 'Move to the PI line, press yy, move to comment line, press p for below or P for above.',
+          goal: { type: 'manual' },
+        },
+      },
+    ],
+  },
+  {
+    id: 'line-control',
+    title: 'Line Control',
+    lessons: [
+      {
+        id: 'moving-to-line-ends',
+        title: 'Moving to Line Ends',
+        keys: ['0', '_', '$'],
+        description:
+          'Three keys get you to different positions on the current line.\n\n**0** jumps to column 0, the very start of the line.\n**_** jumps to the first non-blank character.\n**$** jumps to the end of the line.',
+        demo: [
+          { mode: 'NORMAL', text: '    x = 10\n    y = 20', cursor: [0, 4], description: 'Cursor on x (first non-blank).' },
+          { key: '$', mode: 'NORMAL', text: '    x = 10\n    y = 20', cursor: [0, 9], description: '$ jumps to end of line.' },
+          { key: '0', mode: 'NORMAL', text: '    x = 10\n    y = 20', cursor: [0, 0], description: '0 jumps to column 0 (before the spaces).' },
+          { key: '_', mode: 'NORMAL', text: '    x = 10\n    y = 20', cursor: [0, 4], description: '_ jumps to first non-blank char.' },
+        ],
+        exercise: {
+          initialText: `    x = 10
+    y = 20
+    z = x + y`,
+          instructions: 'On line 1:\n\n1. Press $ to go to the end.\n2. Press 0 to go to column 0.\n3. Press _ to jump back to x (the first non-blank character).',
+          hint: '$ = end of line, 0 = column 0, _ = first non-blank char',
+          goal: { type: 'cursor-reach', targets: [
+            { target: [0, 9], idealKeystrokes: 1 },
+            { target: [0, 4], idealKeystrokes: 1 },
+            { target: [0, 0], idealKeystrokes: 1 },
+            { target: [1, 9], idealKeystrokes: 2 },
+            { target: [1, 4], idealKeystrokes: 1 },
+            { target: [1, 0], idealKeystrokes: 1 },
+            { target: [2, 12], idealKeystrokes: 2 },
+            { target: [2, 4], idealKeystrokes: 1 },
+          ] },
+        },
+      },
+      {
+        id: 'absolute-line-jumps',
+        title: 'Absolute Line Jumps',
+        keys: ['g', 'g', 'G'],
+        description:
+          '**gg** and **G** jump to the top and bottom of the file.\n\n**gg** goes to line 1.\n**G** goes to the last line.\n**{n}G** jumps directly to line n.',
+        demo: [
+          { mode: 'NORMAL', text: 'import os\nimport sys\n\ndef main():\n    pass\n\nif __name__ == "__main__":\n    main()', cursor: [3, 0], description: 'Cursor somewhere in the middle.' },
+          { key: 'gg', mode: 'NORMAL', text: 'import os\nimport sys\n\ndef main():\n    pass\n\nif __name__ == "__main__":\n    main()', cursor: [0, 0], description: 'gg jumps to line 1.' },
+          { key: 'G', mode: 'NORMAL', text: 'import os\nimport sys\n\ndef main():\n    pass\n\nif __name__ == "__main__":\n    main()', cursor: [7, 0], description: 'G jumps to last line.' },
+          { key: '4G', mode: 'NORMAL', text: 'import os\nimport sys\n\ndef main():\n    pass\n\nif __name__ == "__main__":\n    main()', cursor: [3, 0], description: '4G jumps to line 4.' },
+        ],
+        exercise: {
+          initialText: `import os          # top of file
+import sys
+import json
+from pathlib import Path
+from typing import List
+import requests
+import logging
+from datetime import datetime
+import argparse
+import subprocess  # bottom of file`,
+          instructions: '1. Press G to jump to the last line.\n2. Press gg to return to the top.\n3. Press 5G to jump to line 5.',
+          hint: 'G = last line, gg = first line, 5G = line 5.',
+          goal: { type: 'cursor-reach', targets: [
+            { target: [9, 0], idealKeystrokes: 1 },
+            { target: [0, 0], idealKeystrokes: 2 },
+            { target: [4, 0], idealKeystrokes: 2 },
+            { target: [9, 0], idealKeystrokes: 1 },
+            { target: [2, 0], idealKeystrokes: 2 },
+            { target: [0, 0], idealKeystrokes: 2 },
+            { target: [6, 0], idealKeystrokes: 2 },
+            { target: [9, 0], idealKeystrokes: 1 },
+          ] },
+        },
+      },
+      {
         id: 'delete-lines',
         title: 'Delete Lines',
         keys: ['d', 'd', 'D'],
@@ -488,34 +453,69 @@ total = x + w  # keep`,
           goal: { type: 'manual' },
         },
       },
-      {
-        id: 'copy-paste-lines',
-        title: 'Copy/Paste Lines',
-        keys: ['y', 'p', 'P'],
-        description:
-          '**yy** copies the current line. **p** and **P** paste it.\n\n**yy** yanks the full line.\n**p** pastes below the current line.\n**P** pastes above.',
-        demo: [
-          { mode: 'NORMAL', text: 'PI = 3.14159\n# paste below', cursor: [0, 0], description: 'Cursor on line to copy.' },
-          { key: 'yy', mode: 'NORMAL', text: 'PI = 3.14159\n# paste below', cursor: [0, 0], description: 'yy yanks the line into register.' },
-          { key: 'j', mode: 'NORMAL', text: 'PI = 3.14159\n# paste below', cursor: [1, 0], description: 'Move to target line.' },
-          { key: 'p', mode: 'NORMAL', text: 'PI = 3.14159\n# paste below\nPI = 3.14159', cursor: [2, 0], description: 'p pastes below.' },
-        ],
-        exercise: {
-          initialText: `PI = 3.14159
-# paste the PI line below here
-
-# paste it above this comment`,
-          instructions: '1. Yank the PI line with yy.\n2. Paste it below the first comment with p.\n3. Paste it above the second comment with P.',
-          hint: 'Move to the PI line, press yy, move to comment line, press p for below or P for above.',
-          goal: { type: 'manual' },
-        },
-      },
     ],
   },
   {
-    id: 'advanced-vertical-movement',
-    title: 'Line Control',
+    id: 'precise-movement',
+    title: 'Precise Movement',
     lessons: [
+      {
+        id: 'find-character',
+        title: 'Find Character',
+        keys: ['f', 'F', ';'],
+        description:
+          '**f** jumps to a character on the current line.\n\n**f{char}** moves forward to the next occurrence of that character.\n**F{char}** moves backward to the character, landing on it.\n**;** repeats the last search in the same direction.',
+        demo: [
+          { mode: 'NORMAL', text: 'def calc(price, tax, discount):', cursor: [0, 0], description: 'Cursor at start of line.' },
+          { key: 'f,', mode: 'NORMAL', text: 'def calc(price, tax, discount):', cursor: [0, 14], description: 'f, jumps to the first comma.' },
+          { key: ';', mode: 'NORMAL', text: 'def calc(price, tax, discount):', cursor: [0, 19], description: '; repeats, jumps to next comma.' },
+          { key: 'F,', mode: 'NORMAL', text: 'def calc(price, tax, discount):', cursor: [0, 14], description: 'F, searches backward.' },
+        ],
+        exercise: {
+          initialText: `def calculate_total(price, tax, discount):
+    return price + tax - discount`,
+          instructions: '1. On line 1, press f( to jump to the opening parenthesis.\n2. Press ; to jump to the next comma.',
+          hint: 'f( jumps to (, then ; repeats to find the next match.',
+          goal: { type: 'cursor-reach', targets: [
+            { target: [0, 4], idealKeystrokes: 1 },
+            { target: [0, 7], idealKeystrokes: 1 },
+            { target: [0, 23], idealKeystrokes: 1 },
+            { target: [0, 35], idealKeystrokes: 1 },
+            { target: [0, 23], idealKeystrokes: 1 },
+            { target: [0, 7], idealKeystrokes: 1 },
+            { target: [0, 4], idealKeystrokes: 1 },
+            { target: [0, 25], idealKeystrokes: 1 },
+          ] },
+        },
+      },
+      {
+        id: 'till-character',
+        title: 'Till Character',
+        keys: ['t', 'T', ';'],
+        description:
+          '**t** is like **f**, but stops one character short.\n\n**t{char}** moves the cursor just before the target character.\n**T{char}** does the same thing backward, stopping one character to the right of the target.\nOften more useful than f when you want to land right before something.',
+        demo: [
+          { mode: 'NORMAL', text: 'result = do_something(value, callback)', cursor: [0, 0], description: 'Cursor at start.' },
+          { key: 'f)', mode: 'NORMAL', text: 'result = do_something(value, callback)', cursor: [0, 37], description: 'f) lands ON the ).' },
+          { key: 'b', mode: 'NORMAL', text: 'result = do_something(value, callback)', cursor: [0, 29], description: 'b back to callback.' },
+          { key: 't)', mode: 'NORMAL', text: 'result = do_something(value, callback)', cursor: [0, 36], description: 't) stops one char BEFORE ).' },
+        ],
+        exercise: {
+          initialText: `result = do_something(value, callback)`,
+          instructions: 'Use t) to move just before the closing parenthesis. Notice the cursor stops one character before ) unlike f).',
+          hint: 't) stops before the ), f) stops on the ).',
+          goal: { type: 'cursor-reach', targets: [
+            { target: [0, 20], idealKeystrokes: 1 },
+            { target: [0, 26], idealKeystrokes: 1 },
+            { target: [0, 36], idealKeystrokes: 1 },
+            { target: [0, 28], idealKeystrokes: 1 },
+            { target: [0, 22], idealKeystrokes: 1 },
+            { target: [0, 26], idealKeystrokes: 1 },
+            { target: [0, 36], idealKeystrokes: 1 },
+            { target: [0, 8], idealKeystrokes: 1 },
+          ] },
+        },
+      },
       {
         id: 'relative-line-jumps',
         title: 'Relative Line Jumps',
@@ -552,200 +552,11 @@ verbose = True`,
           ] },
         },
       },
-      {
-        id: 'absolute-line-jumps',
-        title: 'Absolute Line Jumps',
-        keys: ['g', 'g', 'G'],
-        description:
-          '**gg** and **G** jump to the top and bottom of the file.\n\n**gg** goes to line 1.\n**G** goes to the last line.\n**{n}G** jumps directly to line n.',
-        demo: [
-          { mode: 'NORMAL', text: 'import os\nimport sys\n\ndef main():\n    pass\n\nif __name__ == "__main__":\n    main()', cursor: [3, 0], description: 'Cursor somewhere in the middle.' },
-          { key: 'gg', mode: 'NORMAL', text: 'import os\nimport sys\n\ndef main():\n    pass\n\nif __name__ == "__main__":\n    main()', cursor: [0, 0], description: 'gg jumps to line 1.' },
-          { key: 'G', mode: 'NORMAL', text: 'import os\nimport sys\n\ndef main():\n    pass\n\nif __name__ == "__main__":\n    main()', cursor: [7, 0], description: 'G jumps to last line.' },
-          { key: '4G', mode: 'NORMAL', text: 'import os\nimport sys\n\ndef main():\n    pass\n\nif __name__ == "__main__":\n    main()', cursor: [3, 0], description: '4G jumps to line 4.' },
-        ],
-        exercise: {
-          initialText: `import os          # top of file
-import sys
-import json
-from pathlib import Path
-from typing import List
-import requests
-import logging
-from datetime import datetime
-import argparse
-import subprocess  # bottom of file`,
-          instructions: '1. Press G to jump to the last line.\n2. Press gg to return to the top.\n3. Press 5G to jump to line 5.',
-          hint: 'G = last line, gg = first line, 5G = line 5.',
-          goal: { type: 'cursor-reach', targets: [
-            { target: [9, 0], idealKeystrokes: 1 },
-            { target: [0, 0], idealKeystrokes: 2 },
-            { target: [4, 0], idealKeystrokes: 2 },
-            { target: [9, 0], idealKeystrokes: 1 },
-            { target: [2, 0], idealKeystrokes: 2 },
-            { target: [0, 0], idealKeystrokes: 2 },
-            { target: [6, 0], idealKeystrokes: 2 },
-            { target: [9, 0], idealKeystrokes: 1 },
-          ] },
-        },
-      },
-      {
-        id: 'paragraph-jumps',
-        title: 'Paragraph Jumps',
-        keys: ['}', '{'],
-        description:
-          '**}** and **{** jump between blank lines.\n\n**}** moves to the next blank line.\n**{** moves to the previous blank line.\nUseful for quickly jumping between code blocks or sections.',
-        demo: [
-          { mode: 'NORMAL', text: 'def setup():\n    config = load()\n\ndef main():\n    run()\n\ndef teardown():\n    cleanup()', cursor: [0, 0], description: 'Cursor at top of first function.' },
-          { key: '}', mode: 'NORMAL', text: 'def setup():\n    config = load()\n\ndef main():\n    run()\n\ndef teardown():\n    cleanup()', cursor: [2, 0], description: '} jumps to next blank line.' },
-          { key: '}', mode: 'NORMAL', text: 'def setup():\n    config = load()\n\ndef main():\n    run()\n\ndef teardown():\n    cleanup()', cursor: [5, 0], description: '} again, next blank line.' },
-          { key: '{', mode: 'NORMAL', text: 'def setup():\n    config = load()\n\ndef main():\n    run()\n\ndef teardown():\n    cleanup()', cursor: [2, 0], description: '{ jumps back up.' },
-        ],
-        exercise: {
-          initialText: `def setup():
-    config = load_config()
-    return config
-
-def process(data):
-    result = transform(data)
-    return result
-
-def teardown():
-    cleanup()`,
-          instructions: 'Press } to jump between paragraphs (blank lines).\n\nPress { to go back up.',
-          hint: '} moves to next blank line, { moves to previous blank line.',
-          goal: { type: 'cursor-reach', targets: [
-            { target: [3, 0], idealKeystrokes: 1 },
-            { target: [7, 0], idealKeystrokes: 1 },
-            { target: [3, 0], idealKeystrokes: 1 },
-            { target: [0, 0], idealKeystrokes: 1 },
-            { target: [3, 0], idealKeystrokes: 1 },
-            { target: [7, 0], idealKeystrokes: 1 },
-            { target: [3, 0], idealKeystrokes: 1 },
-            { target: [0, 0], idealKeystrokes: 1 },
-          ] },
-        },
-      },
-      {
-        id: 'window-scrolls',
-        title: 'Window Scrolls',
-        keys: ['Ctrl+u', 'Ctrl+d'],
-        description:
-          '**Ctrl+d** and **Ctrl+u** scroll the viewport half a screen at a time.\n\n**Ctrl+d** scrolls down.\n**Ctrl+u** scrolls up.\nThe cursor moves with it. Much faster than holding j or k on long files.',
-        demo: [
-          { mode: 'NORMAL', text: 'x_1 = 7\nx_2 = 14\nx_3 = 21\nx_4 = 28\n# ... 40 lines total', cursor: [0, 0], description: '40-line file. Cursor at top.' },
-          { key: 'Ctrl+d', mode: 'NORMAL', text: 'x_20 = 140\nx_21 = 147\nx_22 = 154\nx_23 = 161\n# ... continues', cursor: [0, 0], description: 'Ctrl+d scrolls half a screen down.' },
-          { key: 'Ctrl+u', mode: 'NORMAL', text: 'x_1 = 7\nx_2 = 14\nx_3 = 21\nx_4 = 28\n# ... 40 lines total', cursor: [0, 0], description: 'Ctrl+u scrolls back up.' },
-        ],
-        exercise: {
-          initialText: Array.from({ length: 40 }, (_, i) => `x_${i + 1} = ${(i + 1) * 7}  # variable ${i + 1}`).join('\n'),
-          instructions: 'Press Ctrl+d to scroll down half a page. Press Ctrl+u to scroll back up.',
-          hint: 'Hold Ctrl and press d to scroll down, u to scroll up.',
-          goal: { type: 'manual' },
-        },
-      },
     ],
   },
   {
-    id: 'search',
-    title: 'Search',
-    lessons: [
-      {
-        id: 'search',
-        title: 'Search',
-        keys: ['/', '?'],
-        description:
-          '**/** searches forward, **?** searches backward.\n\n**/pattern** jumps to the next match below the cursor.\n**?pattern** jumps to the next match above.\nPress Enter to confirm and land on the first result.',
-        demo: [
-          { mode: 'NORMAL', text: 'def greet(name):\n    message = "Hello"\n    print(message)\n    return message', cursor: [0, 0], description: 'Cursor at top.' },
-          { key: '/message', mode: 'NORMAL', text: 'def greet(name):\n    message = "Hello"\n    print(message)\n    return message', cursor: [1, 4], description: '/message jumps to first match.' },
-          { key: 'n', mode: 'NORMAL', text: 'def greet(name):\n    message = "Hello"\n    print(message)\n    return message', cursor: [2, 10], description: 'n jumps to next match.' },
-          { key: 'n', mode: 'NORMAL', text: 'def greet(name):\n    message = "Hello"\n    print(message)\n    return message', cursor: [3, 11], description: 'n again, next match.' },
-        ],
-        exercise: {
-          initialText: `def greet(name):
-    message = "Hello, " + name
-    print(message)
-    return message`,
-          instructions: 'Press / then type "message" and press Enter to search for it. Watch the cursor jump to the first match.',
-          hint: 'Type /message then Enter.',
-          goal: { type: 'manual' },
-        },
-      },
-      {
-        id: 'repeat-search',
-        title: 'Repeat Search',
-        keys: ['n', 'N'],
-        description:
-          'After a search, **n** and **N** cycle through every match.\n\n**n** repeats the search in the same direction (forward after /, backward after ?).\n**N** repeats in the opposite direction.\nUse them to step through all occurrences in the file.',
-        exercise: {
-          initialText: `count = 1
-total = count + count
-print(count, total)
-return count`,
-          instructions: '1. Search for "count" with /count Enter.\n2. Press n to jump to each occurrence.\n3. Press N to go backward.',
-          hint: 'After /count Enter, press n repeatedly to cycle through matches.',
-          goal: { type: 'manual' },
-        },
-        demo: [
-          { mode: 'NORMAL', text: 'count = 1\ntotal = count + count\nprint(count, total)\nreturn count', cursor: [0, 0], description: 'count appears 4 times in this file.' },
-          { key: '/count', mode: 'NORMAL', text: 'count = 1\ntotal = count + count\nprint(count, total)\nreturn count', cursor: [0, 0], description: '/count Enter: first match highlighted.' },
-          { key: 'n', mode: 'NORMAL', text: 'count = 1\ntotal = count + count\nprint(count, total)\nreturn count', cursor: [1, 8], description: 'n jumps to next match.' },
-          { key: 'n', mode: 'NORMAL', text: 'count = 1\ntotal = count + count\nprint(count, total)\nreturn count', cursor: [1, 16], description: 'n again, third occurrence.' },
-          { key: 'N', mode: 'NORMAL', text: 'count = 1\ntotal = count + count\nprint(count, total)\nreturn count', cursor: [1, 8], description: 'N goes backward to previous match.' },
-        ],
-      },
-      {
-        id: 'quick-word-search',
-        title: 'Quick Word Search',
-        keys: ['*', '#'],
-        description:
-          '**\\*** and **#** search for the word under the cursor without typing anything.\n\n**\\*** searches forward for the current word.\n**#** searches backward.\nJust position your cursor on the word and press.\n\nNote: **\\*** matches whole words only (searching on `user` won\'t find `users`). Use **g\\*** if you want a substring match.',
-        exercise: {
-          initialText: `user = get_user(id)
-if user:
-    update_user(user)
-    print(user.name)`,
-          instructions: '1. Place your cursor on the word "user" and press * to find all occurrences.\n2. Press n to jump between them.',
-          hint: 'Move to "user", press *, then n to cycle through.',
-          goal: { type: 'manual' },
-        },
-        demo: [
-          { mode: 'NORMAL', text: 'user = get_user(id)\nif user:\n    update_user(user)\n    print(user.name)', cursor: [0, 0], description: 'Cursor is on "user".' },
-          { key: '*', mode: 'NORMAL', text: 'user = get_user(id)\nif user:\n    update_user(user)\n    print(user.name)', cursor: [1, 3], description: '* jumps to next occurrence of "user".' },
-          { key: 'n', mode: 'NORMAL', text: 'user = get_user(id)\nif user:\n    update_user(user)\n    print(user.name)', cursor: [2, 15], description: 'n continues to next match.' },
-          { key: '#', mode: 'NORMAL', text: 'user = get_user(id)\nif user:\n    update_user(user)\n    print(user.name)', cursor: [1, 3], description: '# goes backward.' },
-        ],
-      },
-      {
-        id: 'search-review',
-        title: 'Search Review',
-        keys: ['Review'],
-        description:
-          'A quick recap of all search commands.\n\n**/pattern** searches forward, **?pattern** searches backward.\n**n** goes to the next match, **N** goes to the previous.\n**\\*** searches the word under cursor forward, **#** backward.',
-        exercise: {
-          initialText: `def process_data(data):
-    result = transform(data)
-    error = validate(result)
-    if error:
-        handle_error(error)
-    return result`,
-          instructions: '1. Search for "error", jump through all matches with n.\n2. Use * on "result" to quickly find all its occurrences.',
-          hint: '/error Enter, then n to cycle. Move to "result", press *.',
-          goal: { type: 'manual' },
-        },
-        demo: [
-          { mode: 'NORMAL', text: 'def process_data(data):\n    result = transform(data)\n    error = validate(result)\n    if error:\n        handle_error(error)\n    return result', cursor: [0, 0], description: 'Starting at the top.' },
-          { key: '/error', mode: 'NORMAL', text: 'def process_data(data):\n    result = transform(data)\n    error = validate(result)\n    if error:\n        handle_error(error)\n    return result', cursor: [2, 4], description: '/error finds first match.' },
-          { key: 'n', mode: 'NORMAL', text: 'def process_data(data):\n    result = transform(data)\n    error = validate(result)\n    if error:\n        handle_error(error)\n    return result', cursor: [3, 7], description: 'n to next match.' },
-          { key: '*', mode: 'NORMAL', text: 'def process_data(data):\n    result = transform(data)\n    error = validate(result)\n    if error:\n        handle_error(error)\n    return result', cursor: [1, 4], description: '* on "result" finds all occurrences.' },
-        ],
-      },
-    ],
-  },
-  {
-    id: 'text-objects-brackets',
-    title: 'Brackets',
+    id: 'text-objects',
+    title: 'Text Objects',
     lessons: [
       {
         id: 'intro-to-text-objects',
@@ -868,12 +679,6 @@ print(config)`,
           { key: 'di[', mode: 'NORMAL', text: 'def process(input):\n    data = transform([])\n    return {"result": data}', cursor: [1, 20], description: 'di[ empties the list: brackets stay.' },
         ],
       },
-    ],
-  },
-  {
-    id: 'text-objects-quotes',
-    title: 'Quotes',
-    lessons: [
       {
         id: 'delete-inside-quotes',
         title: 'Delete Inside Quotes',
@@ -949,35 +754,6 @@ author = "Unknown"`,
         ],
       },
       {
-        id: 'quotes-review',
-        title: 'Quotes Review',
-        keys: ['Review'],
-        description:
-          'A recap of all quote text objects.\n\n**di"** deletes inside, **da"** deletes around.\n**ci"** changes inside, **ca"** changes around.\nAll of these work with `"`, `\'`, and `` ` ``.',
-        exercise: {
-          initialText: `data = {
-    "name": "Alice",
-    "greeting": 'Hello',
-    "city": "New York",
-}`,
-          instructions: 'Practice:\n\n- ci" on the "Alice" string\n- ci\' on the \'Hello\' string\n- ci" again on "New York"\n\nChange each value.',
-          hint: 'Move into each string, press ci followed by the matching quote character, type a new value, Esc.',
-          goal: { type: 'manual' },
-        },
-        demo: [
-          { mode: 'NORMAL', text: 'data = {\n    "name": "Alice",\n    "greeting": \'Hello\',\n}', cursor: [1, 12], description: 'Cursor on "Alice" (double quotes).' },
-          { key: 'ci"', mode: 'INSERT', text: 'data = {\n    "name": "",\n    "greeting": \'Hello\',\n}', cursor: [1, 12], description: 'ci" clears inside double quotes.' },
-          { key: 'Esc', mode: 'NORMAL', text: 'data = {\n    "name": "Bob",\n    "greeting": \'Hello\',\n}', cursor: [1, 12], description: 'Typed "Bob", Esc. Now ci\' on greeting.' },
-          { key: "ci'", mode: 'INSERT', text: 'data = {\n    "name": "Bob",\n    "greeting": \'\',\n}', cursor: [2, 16], description: "ci' clears inside single quotes." },
-        ],
-      },
-    ],
-  },
-  {
-    id: 'text-objects-words',
-    title: 'Words',
-    lessons: [
-      {
         id: 'delete-inside-word',
         title: 'Delete Inside Word',
         keys: ['d', 'i', 'w'],
@@ -1033,33 +809,6 @@ another_thing = 100`,
           { key: 'Esc', mode: 'NORMAL', text: 'count = get_value()\nanother_thing = 100', cursor: [0, 4], description: 'Typed "count", pressed Esc.' },
         ],
       },
-      {
-        id: 'words-review',
-        title: 'Words Review',
-        keys: ['Review'],
-        description:
-          'A recap of word text objects.\n\n**diw** deletes the word without touching whitespace.\n**daw** deletes the word and its surrounding space.\n**ciw** changes the word (probably the one you\'ll use most).',
-        exercise: {
-          initialText: `def calculate_total(price, quantity, discount):
-    subtotal = price * quantity
-    savings = subtotal * discount
-    return subtotal - savings`,
-          instructions: 'Use ciw to rename:\n\n- "price" → "cost"\n- "quantity" → "amount"\n- "discount" → "reduction"\n\nTry to do it efficiently.',
-          hint: 'Move to each word, press ciw, type the new name, Esc.',
-          goal: { type: 'manual' },
-        },
-        demo: [
-          { mode: 'NORMAL', text: 'def calculate_total(price, quantity, discount):\n    subtotal = price * quantity', cursor: [0, 20], description: 'Cursor on "price" in params.' },
-          { key: 'ciw', mode: 'INSERT', text: 'def calculate_total(, quantity, discount):\n    subtotal = price * quantity', cursor: [0, 20], description: 'ciw clears "price", Insert mode.' },
-          { key: 'Esc', mode: 'NORMAL', text: 'def calculate_total(cost, quantity, discount):\n    subtotal = price * quantity', cursor: [0, 23], description: 'Typed "cost", Esc. Repeat for each word.' },
-        ],
-      },
-    ],
-  },
-  {
-    id: 'text-objects-paragraphs',
-    title: 'Paragraphs',
-    lessons: [
       {
         id: 'delete-inside-paragraph',
         title: 'Delete Inside Paragraph',
@@ -1139,63 +888,101 @@ def finish():
           { key: 'Esc', mode: 'NORMAL', text: 'def init():\n    setup()\n\ndef main():\n    return process()\n\ndef finish():\n    done()', cursor: [4, 0], description: 'Typed new body, Esc.' },
         ],
       },
-      {
-        id: 'paragraphs-review',
-        title: 'Paragraphs Review',
-        keys: ['Review'],
-        description:
-          'A recap of paragraph text objects.\n\n**dip** deletes inside the paragraph, blank lines stay.\n**dap** deletes around it, blank line included.\n**cip** clears it and drops you into Insert mode.',
-        exercise: {
-          initialText: `def header():
-    return render_header()
-
-def body():
-    items = get_items()
-    return render_items(items)
-
-def footer():
-    return render_footer()`,
-          instructions: 'Use dip to delete the body() block, and cip to replace the footer() block with new text.',
-          hint: 'Move into body(), press dip. Move into footer(), press cip, type new text, Esc.',
-          goal: { type: 'manual' },
-        },
-        demo: [
-          { mode: 'NORMAL', text: 'def header():\n    return render_header()\n\ndef body():\n    items = get_items()\n    return render_items(items)\n\ndef footer():\n    return render_footer()', cursor: [3, 0], description: 'Cursor in body() paragraph.' },
-          { key: 'dip', mode: 'NORMAL', text: 'def header():\n    return render_header()\n\n\ndef footer():\n    return render_footer()', cursor: [3, 0], description: 'dip removes the body() block.' },
-          { key: 'u', mode: 'NORMAL', text: 'def header():\n    return render_header()\n\ndef body():\n    items = get_items()\n    return render_items(items)\n\ndef footer():\n    return render_footer()', cursor: [7, 0], description: 'Undo. Now cip on footer.' },
-          { key: 'cip', mode: 'INSERT', text: 'def header():\n    return render_header()\n\ndef body():\n    items = get_items()\n    return render_items(items)\n\n', cursor: [7, 0], description: 'cip clears footer(), enters Insert.' },
-        ],
-      },
     ],
   },
   {
-    id: 'text-objects-mega-review',
-    title: 'Text Objects Review',
+    id: 'search',
+    title: 'Search',
     lessons: [
       {
-        id: 'mega-review',
-        title: 'Text Objects Mega Review',
-        keys: ['Mega Review'],
+        id: 'search',
+        title: 'Search',
+        keys: ['/', '?'],
         description:
-          'The pattern is always: operator + i/a + object.\n\nOperators: **d** (delete), **c** (change), **y** (yank).\nObjects: **w** (word), **" \' `** (quotes), **( ) { } [ ]** (brackets), **p** (paragraph).\nOnce you know the pattern, you know them all.',
+          '**/** searches forward, **?** searches backward.\n\n**/pattern** jumps to the next match below the cursor.\n**?pattern** jumps to the next match above.\nPress Enter to confirm and land on the first result.',
+        demo: [
+          { mode: 'NORMAL', text: 'def greet(name):\n    message = "Hello"\n    print(message)\n    return message', cursor: [0, 0], description: 'Cursor at top.' },
+          { key: '/message', mode: 'NORMAL', text: 'def greet(name):\n    message = "Hello"\n    print(message)\n    return message', cursor: [1, 4], description: '/message jumps to first match.' },
+          { key: 'n', mode: 'NORMAL', text: 'def greet(name):\n    message = "Hello"\n    print(message)\n    return message', cursor: [2, 10], description: 'n jumps to next match.' },
+          { key: 'n', mode: 'NORMAL', text: 'def greet(name):\n    message = "Hello"\n    print(message)\n    return message', cursor: [3, 11], description: 'n again, next match.' },
+        ],
         exercise: {
-          initialText: `def process_user(user_data):
-    name = "John Doe"
-    tags = ["admin", "editor", "viewer"]
-    config = {"theme": "dark", "lang": "en"}
-
-    if user_data:
-        print("Processing:", name)
-        return {"name": name, "tags": tags, "config": config}`,
-          instructions: 'Practice a variety of text objects:\n\n1. ci" on "John Doe"\n2. di[ on the tags array contents\n3. da{ on the config object\n4. cip on the if block',
-          hint: 'ci" = change string, di[ = delete inside [], da{ = delete around {}, cip = change paragraph.',
+          initialText: `def greet(name):
+    message = "Hello, " + name
+    print(message)
+    return message`,
+          instructions: 'Press / then type "message" and press Enter to search for it. Watch the cursor jump to the first match.',
+          hint: 'Type /message then Enter.',
+          goal: { type: 'manual' },
+        },
+      },
+      {
+        id: 'repeat-search',
+        title: 'Repeat Search',
+        keys: ['n', 'N'],
+        description:
+          'After a search, **n** and **N** cycle through every match.\n\n**n** repeats the search in the same direction (forward after /, backward after ?).\n**N** repeats in the opposite direction.\nUse them to step through all occurrences in the file.',
+        exercise: {
+          initialText: `count = 1
+total = count + count
+print(count, total)
+return count`,
+          instructions: '1. Search for "count" with /count Enter.\n2. Press n to jump to each occurrence.\n3. Press N to go backward.',
+          hint: 'After /count Enter, press n repeatedly to cycle through matches.',
           goal: { type: 'manual' },
         },
         demo: [
-          { mode: 'NORMAL', text: 'def process_user(user_data):\n    name = "John Doe"\n    tags = ["admin", "editor"]\n    config = {"theme": "dark"}', cursor: [1, 11], description: 'Cursor inside "John Doe".' },
-          { key: 'ci"', mode: 'INSERT', text: 'def process_user(user_data):\n    name = ""\n    tags = ["admin", "editor"]\n    config = {"theme": "dark"}', cursor: [1, 11], description: 'ci" clears the string.' },
-          { key: 'Esc', mode: 'NORMAL', text: 'def process_user(user_data):\n    name = "Jane"\n    tags = ["admin", "editor"]\n    config = {"theme": "dark"}', cursor: [2, 11], description: 'Typed "Jane". Now di[ on tags.' },
-          { key: 'di[', mode: 'NORMAL', text: 'def process_user(user_data):\n    name = "Jane"\n    tags = []\n    config = {"theme": "dark"}', cursor: [2, 11], description: 'di[ empties the list.' },
+          { mode: 'NORMAL', text: 'count = 1\ntotal = count + count\nprint(count, total)\nreturn count', cursor: [0, 0], description: 'count appears 4 times in this file.' },
+          { key: '/count', mode: 'NORMAL', text: 'count = 1\ntotal = count + count\nprint(count, total)\nreturn count', cursor: [0, 0], description: '/count Enter: first match highlighted.' },
+          { key: 'n', mode: 'NORMAL', text: 'count = 1\ntotal = count + count\nprint(count, total)\nreturn count', cursor: [1, 8], description: 'n jumps to next match.' },
+          { key: 'n', mode: 'NORMAL', text: 'count = 1\ntotal = count + count\nprint(count, total)\nreturn count', cursor: [1, 16], description: 'n again, third occurrence.' },
+          { key: 'N', mode: 'NORMAL', text: 'count = 1\ntotal = count + count\nprint(count, total)\nreturn count', cursor: [1, 8], description: 'N goes backward to previous match.' },
+        ],
+      },
+      {
+        id: 'quick-word-search',
+        title: 'Quick Word Search',
+        keys: ['*', '#'],
+        description:
+          '**\\*** and **#** search for the word under the cursor without typing anything.\n\n**\\*** searches forward for the current word.\n**#** searches backward.\nJust position your cursor on the word and press.\n\nNote: **\\*** matches whole words only (searching on `user` won\'t find `users`). Use **g\\*** if you want a substring match.',
+        exercise: {
+          initialText: `user = get_user(id)
+if user:
+    update_user(user)
+    print(user.name)`,
+          instructions: '1. Place your cursor on the word "user" and press * to find all occurrences.\n2. Press n to jump between them.',
+          hint: 'Move to "user", press *, then n to cycle through.',
+          goal: { type: 'manual' },
+        },
+        demo: [
+          { mode: 'NORMAL', text: 'user = get_user(id)\nif user:\n    update_user(user)\n    print(user.name)', cursor: [0, 0], description: 'Cursor is on "user".' },
+          { key: '*', mode: 'NORMAL', text: 'user = get_user(id)\nif user:\n    update_user(user)\n    print(user.name)', cursor: [1, 3], description: '* jumps to next occurrence of "user".' },
+          { key: 'n', mode: 'NORMAL', text: 'user = get_user(id)\nif user:\n    update_user(user)\n    print(user.name)', cursor: [2, 15], description: 'n continues to next match.' },
+          { key: '#', mode: 'NORMAL', text: 'user = get_user(id)\nif user:\n    update_user(user)\n    print(user.name)', cursor: [1, 3], description: '# goes backward.' },
+        ],
+      },
+      {
+        id: 'search-review',
+        title: 'Search Review',
+        keys: ['Review'],
+        description:
+          'A quick recap of all search commands.\n\n**/pattern** searches forward, **?pattern** searches backward.\n**n** goes to the next match, **N** goes to the previous.\n**\\*** searches the word under cursor forward, **#** backward.',
+        exercise: {
+          initialText: `def process_data(data):
+    result = transform(data)
+    error = validate(result)
+    if error:
+        handle_error(error)
+    return result`,
+          instructions: '1. Search for "error", jump through all matches with n.\n2. Use * on "result" to quickly find all its occurrences.',
+          hint: '/error Enter, then n to cycle. Move to "result", press *.',
+          goal: { type: 'manual' },
+        },
+        demo: [
+          { mode: 'NORMAL', text: 'def process_data(data):\n    result = transform(data)\n    error = validate(result)\n    if error:\n        handle_error(error)\n    return result', cursor: [0, 0], description: 'Starting at the top.' },
+          { key: '/error', mode: 'NORMAL', text: 'def process_data(data):\n    result = transform(data)\n    error = validate(result)\n    if error:\n        handle_error(error)\n    return result', cursor: [2, 4], description: '/error finds first match.' },
+          { key: 'n', mode: 'NORMAL', text: 'def process_data(data):\n    result = transform(data)\n    error = validate(result)\n    if error:\n        handle_error(error)\n    return result', cursor: [3, 7], description: 'n to next match.' },
+          { key: '*', mode: 'NORMAL', text: 'def process_data(data):\n    result = transform(data)\n    error = validate(result)\n    if error:\n        handle_error(error)\n    return result', cursor: [1, 4], description: '* on "result" finds all occurrences.' },
         ],
       },
     ],
@@ -1246,26 +1033,6 @@ Copy this phrase and paste it below.`,
         ],
       },
       {
-        id: 'switch-selection-ends',
-        title: 'Switch Selection Ends',
-        keys: ['v', 'o'],
-        description:
-          '**o** switches which end of the visual selection is active.\n\nLets you extend or shrink from the other side without restarting.\nJust press **o** while in Visual mode.',
-        exercise: {
-          initialText: `Select from here all the way to the end of this line.`,
-          instructions: 'Press v, select some text, then press o to switch which end is active. Extend from the other side.',
-          hint: 'v → select → o to toggle active end of selection.',
-          goal: { type: 'mode-sequence', sequence: ['VISUAL', 'NORMAL'], reps: 3 },
-        },
-        demo: [
-          { mode: 'NORMAL', text: 'Select from here all the way to the end of this line.', cursor: [0, 7], description: 'Cursor on "from".' },
-          { key: 'v', mode: 'VISUAL', text: 'Select from here all the way to the end of this line.', cursor: [0, 7], description: 'v enters Visual mode.' },
-          { key: 'w w w', mode: 'VISUAL', text: 'Select from here all the way to the end of this line.', cursor: [0, 21], description: 'Selection spans several words.' },
-          { key: 'o', mode: 'VISUAL', text: 'Select from here all the way to the end of this line.', cursor: [0, 7], description: 'o switches active end to the left.' },
-          { key: 'b b', mode: 'VISUAL', text: 'Select from here all the way to the end of this line.', cursor: [0, 0], description: 'b b extends backward from new end.' },
-        ],
-      },
-      {
         id: 'visual-line-mode',
         title: 'Visual Line Mode',
         keys: ['V', 'esc'],
@@ -1286,6 +1053,50 @@ Line E - keep`,
           { key: 'V', mode: 'VISUAL', text: 'Line A - keep\nLine B - select this\nLine C - select this\nLine D - select this\nLine E - keep', cursor: [1, 0], description: 'V selects the entire line.' },
           { key: '2j', mode: 'VISUAL', text: 'Line A - keep\nLine B - select this\nLine C - select this\nLine D - select this\nLine E - keep', cursor: [3, 0], description: '2j extends selection down 2 lines.' },
           { key: 'd', mode: 'NORMAL', text: 'Line A - keep\nLine E - keep', cursor: [1, 0], description: 'd deletes all 3 selected lines.' },
+        ],
+      },
+      {
+        id: 'visual-line-operators',
+        title: 'Visual Line Operators',
+        keys: ['V', 'd', 'y'],
+        description:
+          'After a Visual Line selection, apply an operator to the whole lines.\n\n**d** deletes the selected lines.\n**y** yanks them.\n**p** pastes below, **P** pastes above.\nThis is the cleanest way to move blocks of code around.',
+        exercise: {
+          initialText: `def first():
+    return 1
+
+def second():
+    return 2`,
+          instructions: '1. Use V + j to select the "first" function (3 lines).\n2. Yank with y.\n3. Paste it below the "second" function with p.',
+          hint: 'V on "function first", 2j to extend, y to yank, move below second function, p to paste.',
+          goal: { type: 'mode-sequence', sequence: ['VISUAL', 'NORMAL'], reps: 2 },
+        },
+        demo: [
+          { mode: 'NORMAL', text: 'def first():\n    return 1\n\ndef second():\n    return 2', cursor: [0, 0], description: 'Cursor on first() function.' },
+          { key: 'V', mode: 'VISUAL', text: 'def first():\n    return 1\n\ndef second():\n    return 2', cursor: [0, 0], description: 'V selects line 1.' },
+          { key: '2j', mode: 'VISUAL', text: 'def first():\n    return 1\n\ndef second():\n    return 2', cursor: [2, 0], description: '2j extends to include blank line.' },
+          { key: 'y', mode: 'NORMAL', text: 'def first():\n    return 1\n\ndef second():\n    return 2', cursor: [0, 0], description: 'y yanks the 3 lines.' },
+          { key: 'G p', mode: 'NORMAL', text: 'def first():\n    return 1\n\ndef second():\n    return 2\ndef first():\n    return 1\n', cursor: [5, 0], description: 'G then p pastes below second().' },
+        ],
+      },
+      {
+        id: 'switch-selection-ends',
+        title: 'Switch Selection Ends',
+        keys: ['v', 'o'],
+        description:
+          '**o** switches which end of the visual selection is active.\n\nLets you extend or shrink from the other side without restarting.\nJust press **o** while in Visual mode.',
+        exercise: {
+          initialText: `Select from here all the way to the end of this line.`,
+          instructions: 'Press v, select some text, then press o to switch which end is active. Extend from the other side.',
+          hint: 'v → select → o to toggle active end of selection.',
+          goal: { type: 'mode-sequence', sequence: ['VISUAL', 'NORMAL'], reps: 3 },
+        },
+        demo: [
+          { mode: 'NORMAL', text: 'Select from here all the way to the end of this line.', cursor: [0, 7], description: 'Cursor on "from".' },
+          { key: 'v', mode: 'VISUAL', text: 'Select from here all the way to the end of this line.', cursor: [0, 7], description: 'v enters Visual mode.' },
+          { key: 'w w w', mode: 'VISUAL', text: 'Select from here all the way to the end of this line.', cursor: [0, 21], description: 'Selection spans several words.' },
+          { key: 'o', mode: 'VISUAL', text: 'Select from here all the way to the end of this line.', cursor: [0, 7], description: 'o switches active end to the left.' },
+          { key: 'b b', mode: 'VISUAL', text: 'Select from here all the way to the end of this line.', cursor: [0, 0], description: 'b b extends backward from new end.' },
         ],
       },
       {
@@ -1312,29 +1123,66 @@ Bottom line`,
           { key: 'j', mode: 'VISUAL', text: 'Top line\nMiddle line A\nMiddle line B\nMiddle line C\nBottom line', cursor: [3, 0], description: 'j extends down from new active end.' },
         ],
       },
+    ],
+  },
+  {
+    id: 'advanced-navigation',
+    title: 'Advanced Navigation',
+    lessons: [
       {
-        id: 'visual-line-operators',
-        title: 'Visual Line Operators',
-        keys: ['V', 'd', 'y'],
+        id: 'paragraph-jumps',
+        title: 'Paragraph Jumps',
+        keys: ['}', '{'],
         description:
-          'After a Visual Line selection, apply an operator to the whole lines.\n\n**d** deletes the selected lines.\n**y** yanks them.\n**p** pastes below, **P** pastes above.\nThis is the cleanest way to move blocks of code around.',
-        exercise: {
-          initialText: `def first():
-    return 1
-
-def second():
-    return 2`,
-          instructions: '1. Use V + j to select the "first" function (3 lines).\n2. Yank with y.\n3. Paste it below the "second" function with p.',
-          hint: 'V on "function first", 2j to extend, y to yank, move below second function, p to paste.',
-          goal: { type: 'mode-sequence', sequence: ['VISUAL', 'NORMAL'], reps: 2 },
-        },
+          '**}** and **{** jump between blank lines.\n\n**}** moves to the next blank line.\n**{** moves to the previous blank line.\nUseful for quickly jumping between code blocks or sections.',
         demo: [
-          { mode: 'NORMAL', text: 'def first():\n    return 1\n\ndef second():\n    return 2', cursor: [0, 0], description: 'Cursor on first() function.' },
-          { key: 'V', mode: 'VISUAL', text: 'def first():\n    return 1\n\ndef second():\n    return 2', cursor: [0, 0], description: 'V selects line 1.' },
-          { key: '2j', mode: 'VISUAL', text: 'def first():\n    return 1\n\ndef second():\n    return 2', cursor: [2, 0], description: '2j extends to include blank line.' },
-          { key: 'y', mode: 'NORMAL', text: 'def first():\n    return 1\n\ndef second():\n    return 2', cursor: [0, 0], description: 'y yanks the 3 lines.' },
-          { key: 'G p', mode: 'NORMAL', text: 'def first():\n    return 1\n\ndef second():\n    return 2\ndef first():\n    return 1\n', cursor: [5, 0], description: 'G then p pastes below second().' },
+          { mode: 'NORMAL', text: 'def setup():\n    config = load()\n\ndef main():\n    run()\n\ndef teardown():\n    cleanup()', cursor: [0, 0], description: 'Cursor at top of first function.' },
+          { key: '}', mode: 'NORMAL', text: 'def setup():\n    config = load()\n\ndef main():\n    run()\n\ndef teardown():\n    cleanup()', cursor: [2, 0], description: '} jumps to next blank line.' },
+          { key: '}', mode: 'NORMAL', text: 'def setup():\n    config = load()\n\ndef main():\n    run()\n\ndef teardown():\n    cleanup()', cursor: [5, 0], description: '} again, next blank line.' },
+          { key: '{', mode: 'NORMAL', text: 'def setup():\n    config = load()\n\ndef main():\n    run()\n\ndef teardown():\n    cleanup()', cursor: [2, 0], description: '{ jumps back up.' },
         ],
+        exercise: {
+          initialText: `def setup():
+    config = load_config()
+    return config
+
+def process(data):
+    result = transform(data)
+    return result
+
+def teardown():
+    cleanup()`,
+          instructions: 'Press } to jump between paragraphs (blank lines).\n\nPress { to go back up.',
+          hint: '} moves to next blank line, { moves to previous blank line.',
+          goal: { type: 'cursor-reach', targets: [
+            { target: [3, 0], idealKeystrokes: 1 },
+            { target: [7, 0], idealKeystrokes: 1 },
+            { target: [3, 0], idealKeystrokes: 1 },
+            { target: [0, 0], idealKeystrokes: 1 },
+            { target: [3, 0], idealKeystrokes: 1 },
+            { target: [7, 0], idealKeystrokes: 1 },
+            { target: [3, 0], idealKeystrokes: 1 },
+            { target: [0, 0], idealKeystrokes: 1 },
+          ] },
+        },
+      },
+      {
+        id: 'window-scrolls',
+        title: 'Window Scrolls',
+        keys: ['Ctrl+u', 'Ctrl+d'],
+        description:
+          '**Ctrl+d** and **Ctrl+u** scroll the viewport half a screen at a time.\n\n**Ctrl+d** scrolls down.\n**Ctrl+u** scrolls up.\nThe cursor moves with it. Much faster than holding j or k on long files.',
+        demo: [
+          { mode: 'NORMAL', text: 'x_1 = 7\nx_2 = 14\nx_3 = 21\nx_4 = 28\n# ... 40 lines total', cursor: [0, 0], description: '40-line file. Cursor at top.' },
+          { key: 'Ctrl+d', mode: 'NORMAL', text: 'x_20 = 140\nx_21 = 147\nx_22 = 154\nx_23 = 161\n# ... continues', cursor: [0, 0], description: 'Ctrl+d scrolls half a screen down.' },
+          { key: 'Ctrl+u', mode: 'NORMAL', text: 'x_1 = 7\nx_2 = 14\nx_3 = 21\nx_4 = 28\n# ... 40 lines total', cursor: [0, 0], description: 'Ctrl+u scrolls back up.' },
+        ],
+        exercise: {
+          initialText: Array.from({ length: 40 }, (_, i) => `x_${i + 1} = ${(i + 1) * 7}  # variable ${i + 1}`).join('\n'),
+          instructions: 'Press Ctrl+d to scroll down half a page. Press Ctrl+u to scroll back up.',
+          hint: 'Hold Ctrl and press d to scroll down, u to scroll up.',
+          goal: { type: 'manual' },
+        },
       },
     ],
   },
@@ -1444,6 +1292,12 @@ result = process()`,
       },
     ],
   },
+  {
+    id: 'command-mode',
+    title: 'Command Mode',
+    lessons: [
+    ],
+  },
 ]
 
 export function getAllLessons(): { section: Section; lesson: Lesson }[] {
@@ -1459,3 +1313,4 @@ export function findLesson(sectionId: string, lessonId: string) {
   if (!lesson) return null
   return { section, lesson }
 }
+
