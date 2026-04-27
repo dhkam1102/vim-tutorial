@@ -172,7 +172,7 @@ body {
   letter-spacing: 0.1em;
   text-transform: uppercase;
   font-weight: 600;
-  color: var(--text-secondary);
+  color: var(--text-muted);
 }
 
 /* ─── Section fade-in (replaces phosphor flicker) ─────────────────── */

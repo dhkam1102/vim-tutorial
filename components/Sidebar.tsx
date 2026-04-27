@@ -53,7 +53,7 @@ export default function Sidebar({ onCollapse }: { onCollapse?: () => void }) {
 
         <div className="space-y-5">
           {curriculum.map((section, si) => (
-            <div key={section.id} className="phosphor-in" style={{ animationDelay: `${si * 0.04}s` }}>
+            <div key={section.id} className={`phosphor-in${si > 0 ? ' border-t border-[var(--border)] pt-4' : ''}`} style={{ animationDelay: `${si * 0.04}s` }}>
               {/* Section heading */}
               <h2 id={`section-${section.id}`} className="section-label px-2 mb-1.5">
                 {section.title}
